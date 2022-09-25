@@ -1,0 +1,56 @@
+/* google fonts */
+@import url("https://fonts.googleapis.com/css2?family=Boogaloo&family=Open+Sans:wght@400;800&display=swap");
+/* basic css reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --ff-title: "Boogaloo", cursive;
+  --ff-main: "Open Sans", sans-serif;
+  --fw-regular: 400;
+  --fw-bold: 600;
+  --fw-black: 800;
+  --border-radius: 8px;
+  --box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
+    rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  --clr-neutral-900: #222629;
+  --clr-neutral-700: #747b4f;
+  --clr-neutral-200: #6b6e70;
+  --clr-neutral-100: #c8d0d5;
+  --clr-accent-100: #86c232;
+  --clr-accent-300: #61892f;
+}
+
+body {
+  background: var(--clr-neutral-900);
+  color: var(--clr-neutral-100);
+  font-family: var(--ff-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+header {
+  line-height: 1;
+}
+header h1 {
+  font-family: var(--ff-title);
+  font-weight: var(--fw-regular);
+  font-size: 5rem;
+  text-align: center;
+}
+header h1 span {
+  color: var(--clr-accent-100);
+}
+header p {
+  color: var(--clr-neutral-200);
+  font-weight: var(--fw-regular);
+  text-align: center;
+}/*# sourceMappingURL=style.css.map */
