@@ -1,46 +1,62 @@
 // store gameboard array within Gameboard object
 
-const GameModule = (function () {
-  const gameboard = ["X", "O", "X", "O", "X", "O", "X", "O", "O"];
+const GameboardModule = (function () {
+  const gameboardArray = ["", "", "", "", "", "", "", "", ""];
+  // const gameboard = ["X", "O", "O", "X", "O", "O", "X", "O", "X"];
   const gameContainer = cacheDOM();
+  const gameboardElements = render();
 
   function cacheDOM() {
-    console.warn("cacheDOM fired: targetting game container.");
     return document.getElementById("game-container");
   }
 
   function render() {
-    gameboard.forEach((value, i) => {
+    return gameboardArray.map((value, i) => {
       const div = document.createElement("div");
+
+      // basic styling
       div.classList.add("square");
+
+      // hover effect
+      div.classList.add("enabled");
+
       div.setAttribute("data-position", i);
-      div.textContent = value;
-      value === "X"
-        ? div.classList.add("player1")
-        : div.classList.add("player2");
       div.addEventListener("click", clickEvent);
       gameContainer.appendChild(div);
+      return div;
     });
   }
 
-  function clickEvent(e) {
-    const position = e.target.dataset.position;
-    console.log({ position }, gameboard[position]);
+  function reset() {
+    gameboardArray.forEach((i) => (i = ""));
+    gameboardElements.forEach((square) => {
+      square.textContent = "";
+      square.classList.remove("player1");
+      square.classList.remove("player2");
+      square.classList.add("enabled");
+      square.addEventListener("click", clickEvent);
+    });
+    console.log(gameboardArray);
   }
 
-  // function reset() {
-  //   gameboard.forEach((box) => {});
-  // }
+  function clickEvent(e) {
+    const element = e.target;
+    const position = e.target.dataset.position;
+
+    element.removeEventListener("click", clickEvent);
+    element.classList.remove("enabled");
+
+    // pass event to gameflow module
+
+    // temporary:
+    element.classList.add("player1");
+    element.textContent = "X";
+    console.log({ position }, gameboardArray[position]);
+    console.log(element);
+  }
 
   return {
     render,
+    reset,
   };
 })();
-
-// const playerFactory = (name) => {
-//   return {
-//     name,
-//   };
-// };
-
-GameModule.render();
