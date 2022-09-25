@@ -1,14 +1,10 @@
 // store gameboard array within Gameboard object
 
 const GameboardModule = (function () {
-  const gameboardArray = ["", "", "", "", "", "", "", "", ""];
+  let gameboardArray = ["", "", "", "", "", "", "", "", ""];
   // const gameboard = ["X", "O", "O", "X", "O", "O", "X", "O", "X"];
-  const gameContainer = cacheDOM();
+  const gameContainer = document.getElementById("game-container");
   const gameboardElements = render();
-
-  function cacheDOM() {
-    return document.getElementById("game-container");
-  }
 
   function render() {
     return gameboardArray.map((value, i) => {
@@ -31,8 +27,8 @@ const GameboardModule = (function () {
     gameboardArray.forEach((i) => (i = ""));
     gameboardElements.forEach((square) => {
       square.textContent = "";
-      square.classList.remove("player1");
-      square.classList.remove("player2");
+      square.classList.remove("x");
+      square.classList.remove("o");
       square.classList.add("enabled");
       square.addEventListener("click", clickEvent);
     });
@@ -41,18 +37,24 @@ const GameboardModule = (function () {
 
   function clickEvent(e) {
     const element = e.target;
-    const position = e.target.dataset.position;
 
     element.removeEventListener("click", clickEvent);
     element.classList.remove("enabled");
 
-    // pass event to gameflow module
+    const player = GameFlow.getPlayersTurn();
+    playSquare(player, element);
+  }
 
-    // temporary:
-    element.classList.add("player1");
-    element.textContent = "X";
-    console.log({ position }, gameboardArray[position]);
-    console.log(element);
+  function playSquare(player, element) {
+    const position = element.dataset.position;
+
+    let marker;
+    player === 0 ? (marker = "x") : (marker = "o");
+
+    element.classList.add(marker);
+    element.textContent = marker;
+
+    gameboardArray[position] = marker;
   }
 
   return {
@@ -60,3 +62,23 @@ const GameboardModule = (function () {
     reset,
   };
 })();
+
+const GameFlow = (() => {
+  let playersTurn = 0;
+
+  const getPlayersTurn = () =>
+    playersTurn === 0 ? (playersTurn = 1) : (playersTurn = 0);
+
+  return {
+    getPlayersTurn,
+  };
+})();
+
+// const playerFactory = (name) => {
+//   return {
+//     name,
+//   };
+// };
+
+// let playerOne = playerFactory("Joe");
+// let playerTwo = playerFactory("Steve");
