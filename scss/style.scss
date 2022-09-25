@@ -34,9 +34,8 @@ body {
   color: var(--clr-neutral-100);
   font-family: var(--ff-main);
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
 
   height: 100vh;
   width: 100vw;
@@ -47,7 +46,7 @@ header {
   h1 {
     font-family: var(--ff-title);
     font-weight: var(--fw-regular);
-    font-size: 5rem;
+    font-size: min(8rem, 15vw);
 
     text-align: center;
 
@@ -59,5 +58,45 @@ header {
     color: var(--clr-neutral-200);
     font-weight: var(--fw-regular);
     text-align: center;
+  }
+}
+
+main {
+  place-self: start center;
+
+  display: grid;
+  margin: 5rem;
+
+  width: min(45rem, 90%);
+  aspect-ratio: 1;
+}
+
+#game-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 0.75rem;
+
+  background: var(--clr-neutral-200);
+
+  .square {
+    display: grid;
+    place-items: center;
+
+    height: 100%;
+    width: 100%;
+
+    font-size: min(15vw, 9rem);
+    font-weight: var(--fw-bold);
+
+    background: var(--clr-neutral-900);
+
+    &.player1 {
+      color: var(--clr-neutral-100);
+    }
+
+    &.player2 {
+      color: var(--clr-accent-100);
+    }
   }
 }
