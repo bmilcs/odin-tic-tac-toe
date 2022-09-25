@@ -10,13 +10,10 @@ const GameboardModule = (function () {
     return gameboardArray.map((value, i) => {
       const div = document.createElement("div");
 
-      // basic styling
       div.classList.add("square");
-
-      // hover effect
       div.classList.add("enabled");
-
       div.setAttribute("data-position", i);
+
       div.addEventListener("click", clickEvent);
       gameContainer.appendChild(div);
       return div;
@@ -32,7 +29,6 @@ const GameboardModule = (function () {
       square.classList.add("enabled");
       square.addEventListener("click", clickEvent);
     });
-    console.log(gameboardArray);
   }
 
   function clickEvent(e) {
@@ -74,11 +70,31 @@ const GameFlow = (() => {
   };
 })();
 
-// const playerFactory = (name) => {
-//   return {
-//     name,
-//   };
-// };
+// Function Factories w/ Inheritance (practice - unnecessary)
 
-// let playerOne = playerFactory("Joe");
-// let playerTwo = playerFactory("Steve");
+const playerFactory = (playerName) => {
+  return {
+    playerName,
+  };
+};
+
+const playerOne = (name) => {
+  const { playerName } = playerFactory(name);
+  const marker = "x";
+  return {
+    name,
+    marker,
+  };
+};
+
+const playerTwo = () => {
+  const { playerName } = playerFactory("Computer");
+  const marker = "o";
+  return {
+    name,
+    marker,
+  };
+};
+
+let person = playerOne("Joe");
+let computer = playerTwo();
