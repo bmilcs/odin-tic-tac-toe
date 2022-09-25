@@ -15,10 +15,13 @@
   --fw-regular: 400;
   --fw-bold: 600;
   --fw-black: 800;
-  --border-radius: 8px;
+  --border-radius: 0.75rem;
   --box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
-    rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+    rgba(0, 0, 0, 0.05) 0px 4px 6px -2px
+  --text-shadow: 0px 4px 3px hsla(0, 0%, 0%, 0.4),
+        0px 8px 13px hsla(0, 0%, 0%, 0.102), 0px 18px 23px hsla(0, 0%, 0%, 0.1);
   --clr-neutral-900: #222629;
+  --clr-neutral-800: hsl(206, 9%, 25%);
   --clr-neutral-700: #747b4f;
   --clr-neutral-200: #6b6e70;
   --clr-neutral-100: #c8d0d5;
@@ -44,9 +47,19 @@ header h1 {
   font-weight: var(--fw-regular);
   font-size: min(8rem, 15vw);
   text-align: center;
+  transition: all 0.3s ease-in-out;
 }
 header h1 span {
   color: var(--clr-accent-100);
+}
+header h1:hover {
+  letter-spacing: 0.5rem;
+  color: var(--clr-accent-100);
+  text-shadow: var(--text-shadow);
+  transition: all 0.3s ease-in-out;
+}
+header h1:hover span {
+  color: var(--clr-neutral-100);
 }
 header p {
   color: var(--clr-neutral-200);
@@ -57,17 +70,19 @@ header p {
 main {
   place-self: start center;
   display: grid;
-  margin: 5rem;
+  margin-block: 5rem;
   width: min(45rem, 90%);
   aspect-ratio: 1;
+  background: var(--clr-neutral-800);
+  padding: 1rem;
 }
 
 #game-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 0.75rem;
-  background: var(--clr-neutral-200);
+  gap: 1rem;
+  background: var(--clr-neutral-800);
 }
 #game-container .square {
   display: grid;
@@ -83,4 +98,16 @@ main {
 }
 #game-container .square.player2 {
   color: var(--clr-accent-100);
+}
+#game-container .square.enabled:hover {
+  background: var(--clr-neutral-800);
+  box-shadow: 0px 0px 52px 2px var(--clr-neutral-900) inset;
+  transition: all 0.2s ease-in-out;
+  text-shadow: var(--text-shadow);
+}
+#game-container .square.enabled:active {
+  box-shadow: none;
+  background: var(--clr-accent-300);
+  color: var(--clr-neutral-900);
+  transition: all 0.1s linear;
 }/*# sourceMappingURL=style.css.map */
