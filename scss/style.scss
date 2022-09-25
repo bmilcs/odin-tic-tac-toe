@@ -106,16 +106,18 @@ main {
     height: 100%;
     width: 100%;
 
+    background: var(--clr-neutral-900);
+
     font-size: min(15vw, 9rem);
     font-weight: var(--fw-bold);
 
-    background: var(--clr-neutral-900);
+    text-transform: uppercase;
 
-    &.player1 {
+    &.x {
       color: var(--clr-neutral-100);
     }
 
-    &.player2 {
+    &.o {
       color: var(--clr-accent-100);
     }
     &.enabled:hover {

@@ -89,14 +89,15 @@ main {
   place-items: center;
   height: 100%;
   width: 100%;
+  background: var(--clr-neutral-900);
   font-size: min(15vw, 9rem);
   font-weight: var(--fw-bold);
-  background: var(--clr-neutral-900);
+  text-transform: uppercase;
 }
-#game-container .square.player1 {
+#game-container .square.x {
   color: var(--clr-neutral-100);
 }
-#game-container .square.player2 {
+#game-container .square.o {
   color: var(--clr-accent-100);
 }
 #game-container .square.enabled:hover {
