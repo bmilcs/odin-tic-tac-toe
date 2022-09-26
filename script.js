@@ -1,43 +1,44 @@
-// store gameboard array within Gameboard object
+// store gameBoard array within gameBoard object
 
-const GameboardModule = (function () {
-  let gameboardArray = ["", "", "", "", "", "", "", "", ""];
-  // const gameboard = ["X", "O", "O", "X", "O", "O", "X", "O", "X"];
+const GameBoard = (function () {
+  const gameBoardArray = ["", "", "", "", "", "", "", "", ""];
+  // const gameBoard = ["X", "O", "O", "X", "O", "O", "X", "O", "X"];
   const gameContainer = document.getElementById("game-container");
-  const gameboardElements = render();
+  const gameBoardElements = render();
 
   function render() {
-    return gameboardArray.map((value, i) => {
+    return gameBoardArray.map((value, i) => {
       const div = document.createElement("div");
 
       div.classList.add("square");
       div.classList.add("enabled");
       div.setAttribute("data-position", i);
 
-      div.addEventListener("click", clickEvent);
+      div.addEventListener("click", selectSquare);
       gameContainer.appendChild(div);
       return div;
     });
   }
 
   function reset() {
-    gameboardArray.forEach((i) => (i = ""));
-    gameboardElements.forEach((square) => {
+    gameBoardArray.forEach((i) => (i = ""));
+    gameBoardElements.forEach((square) => {
       square.textContent = "";
       square.classList.remove("x");
       square.classList.remove("o");
       square.classList.add("enabled");
-      square.addEventListener("click", clickEvent);
+      square.addEventListener("click", selectSquare);
     });
   }
 
-  function clickEvent(e) {
+  function selectSquare(e) {
     const element = e.target;
 
-    element.removeEventListener("click", clickEvent);
+    // disable square
+    element.removeEventListener("click", selectSquare);
     element.classList.remove("enabled");
 
-    const player = GameFlow.getPlayersTurn();
+    const player = Game.getPlayersTurn();
     playSquare(player, element);
   }
 
@@ -45,56 +46,85 @@ const GameboardModule = (function () {
     const position = element.dataset.position;
 
     let marker;
-    player === 0 ? (marker = "x") : (marker = "o");
+    player === "o" ? (marker = "x") : (marker = "o");
 
     element.classList.add(marker);
     element.textContent = marker;
 
-    gameboardArray[position] = marker;
+    gameBoardArray[position] = marker;
+    console.log(gameBoardArray);
+  }
+
+  function getGameBoard() {
+    return gameBoardArray;
   }
 
   return {
     render,
     reset,
+    getGameBoard,
   };
 })();
 
-const GameFlow = (() => {
-  let playersTurn = 0;
+const Game = (() => {
+  let playersTurn = "x";
 
-  const getPlayersTurn = () =>
-    playersTurn === 0 ? (playersTurn = 1) : (playersTurn = 0);
+  function getPlayerDetails() {
+    // prompt user for # of players
+    // get user 1 & 2's name > create objects via player
+    // if 1 player, automatically assign PC to player 2
+    // call beginGame()
+  }
+
+  function resetScoreboard() {
+    // reset player1.score & player 2
+    // reset dom elements
+  }
+
+  function beginGame() {
+    // reset scoreboard
+    // set player's turn
+    // beginRound()
+  }
+
+  function beginRound() {
+    // Gameboard.reset()
+    // display player X's name
+  }
+
+  function checkForWinner() {
+    const gameStatus = GameBoard.getGameBoard;
+    // check for winning combinations
+    // return true if winner exists, false if not
+  }
+
+  function getPlayersTurn() {
+    playersTurn === "x" ? (playersTurn = "o") : (playersTurn = "x");
+  }
 
   return {
     getPlayersTurn,
   };
 })();
 
-// Function Factories w/ Inheritance (practice - unnecessary)
+// Function Factory:
 
-const playerFactory = (playerName) => {
+const playerFactory = (playerName, OX) => {
+  const name = playerName;
+  const marker = OX;
+  const score = 0;
+  const getName = () => {
+    return name;
+  };
+  const getScore = () => {
+    return score;
+  };
+  const getMarker = () => {
+    return marker;
+  };
   return {
-    playerName,
+    getName,
+    getMarker,
+    getScore,
   };
 };
-
-const playerOne = (name) => {
-  const { playerName } = playerFactory(name);
-  const marker = "x";
-  return {
-    name,
-    marker,
-  };
-};
-
-const playerTwo = () => {
-  const { playerName } = playerFactory("Computer");
-  const marker = "o";
-  return {
-    name,
-    marker,
-  };
-};
-
-let person = playerOne("Joe");
-let computer = playerTwo();
