@@ -1,20 +1,15 @@
 // store gameBoard array within gameBoard object
 
 const GameBoard = (function () {
-  let gameBoardArray = ["", "", "", "", "", "", "", "", ""];
-  // const gameBoard = ["X", "O", "O", "X", "O", "O", "X", "O", "X"];
   const gameContainer = document.getElementById("game-container");
+  let gameBoardArray = ["", "", "", "", "", "", "", "", ""];
   const gameBoardElements = render();
 
   function render() {
     return gameBoardArray.map((value, i) => {
       const div = document.createElement("div");
-
       div.classList.add("square");
-      div.classList.add("enabled");
       div.setAttribute("data-position", i);
-
-      div.addEventListener("click", selectSquare);
       gameContainer.appendChild(div);
       return div;
     });
@@ -41,8 +36,8 @@ const GameBoard = (function () {
     element.removeEventListener("click", selectSquare);
     element.classList.remove("enabled");
 
-    const player = Game.getPlayersTurn();
-    const marker = player.getMarker();
+    const activePlayer = Game.getActivePlayer();
+    const marker = activePlayer.getMarker();
 
     element.classList.add(marker);
     element.textContent = marker;
@@ -65,46 +60,54 @@ const GameBoard = (function () {
 })();
 
 const Game = (function () {
-  let player1, player2;
+  let player1,
+    player2,
+    activePlayer,
+    round = 0;
+
   getPlayerDetails();
-  let playersTurn = player1;
+  beginGame();
 
   function getPlayerDetails() {
-    player1 = playerFactory("Bryan", "x");
-    player2 = playerFactory("Joe", "o");
     // prompt user for # of players
     // get user 1 & 2's name > create objects via player
     // if 1 player, automatically assign PC to player 2
-    // call beginGame()
+    player1 = playerFactory("Bryan", "x");
+    player2 = playerFactory("Joe", "o");
   }
 
   function updateScoreboard() {
-    // update elements = player1.getScore()
+    // update elements = player1/2.getScore()
+    console.log(
+      player1.getName(),
+      player1.getScore(),
+      player2.getName(),
+      player2.getScore()
+    );
   }
 
-  function resetScoreboard() {
-    // reset player1.score & player 2
-    // reset dom elements
+  function resetScores() {
+    player1.resetScore();
+    player2.resetScore();
+    // reset scoreboard dom elements
   }
 
   function beginGame() {
-    // reset scoreboard
-    // set player's turn
-    // beginRound()
+    activePlayer = player1;
+    beginRound();
   }
 
   function beginRound() {
-    // Gameboard.reset()
+    GameBoard.reset();
+    round += 1;
     // display player X's name
+    console.log(
+      `Round ${round} Begins. ${activePlayer.getName()} is up first!`
+    );
   }
 
   function isRoundOver(arr) {
     const xo = /[xo]/;
-
-    // arr: gameboard
-    // 0, 1, 2
-    // 3, 4, 5
-    // 6, 7, 8
 
     if (
       // horizontal line wins:
@@ -121,44 +124,69 @@ const Game = (function () {
     ) {
       declareRoundWinner();
     } else {
-      togglePlayersTurn();
-      // update players turn gui element
+      toggleActivePlayer();
     }
   }
 
   function declareRoundWinner() {
-    const winner = getPlayersTurn();
+    const winner = getActivePlayer();
     winner.incrementScore();
 
     // display victory gui element / modal
-    // updateScoreBoard()
-
-    GameBoard.reset();
-
-    // let loser go first in next round
-    togglePlayersTurn();
-
-    console.log(GameBoard.getGameBoard());
     console.warn("Winner:", winner.getName());
-    console.log(
-      player1.getName(),
-      player1.getScore(),
-      player2.getName(),
-      player2.getScore()
-    );
+
+    updateScoreboard();
+
+    if (isGameOver()) {
+      declareGameWinner();
+    } else {
+      // let loser go first in next round
+      toggleActivePlayer();
+      beginRound();
+    }
   }
 
-  function togglePlayersTurn() {
-    playersTurn === player1 ? (playersTurn = player2) : (playersTurn = player1);
+  function isGameOver() {
+    if (player1.getScore() === 3 || player2.getScore() === 3) return true;
   }
 
-  function getPlayersTurn() {
-    return playersTurn;
+  function declareGameWinner() {
+    let winner;
+    player1.getScore() === 3 ? (winner = player1) : (winner = player2);
+
+    // display gui element for winner of 3 round game
+    console.warn(`${winner.getName()} is the winner of 3 rounds!`);
+
+    askPlayAgain();
+  }
+
+  function toggleActivePlayer() {
+    activePlayer === player1
+      ? (activePlayer = player2)
+      : (activePlayer = player1);
+    displayActivePlayer();
+  }
+
+  function displayActivePlayer() {
+    // update gui to show whos turn it is
+    console.log(`Turn: ${activePlayer.getName()}`);
+  }
+
+  function getActivePlayer() {
+    return activePlayer;
+  }
+
+  function askPlayAgain() {
+    console.log("Would you like to play again?");
+    // create gui element to ask if they want to play another round
+    // if yes
+    resetScores();
+    beginGame();
   }
 
   return {
-    getPlayersTurn,
-    isRoundOver: isRoundOver,
+    getActivePlayer,
+    isRoundOver,
   };
 })();
 
@@ -171,7 +199,10 @@ function playerFactory(playerName, OX) {
 
   function incrementScore() {
     _score += 1;
-    console.warn(`${_name}'s score updated! now: ${_score}`);
+  }
+
+  function resetScore() {
+    _score = 0;
   }
 
   function getName() {
@@ -191,5 +222,6 @@ function playerFactory(playerName, OX) {
     getMarker,
     getScore,
     incrementScore,
+    resetScore,
   };
 }
