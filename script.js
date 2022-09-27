@@ -60,10 +60,7 @@ const GameBoard = (function () {
 })();
 
 const Game = (function () {
-  let player1,
-    player2,
-    activePlayer,
-    round = 0;
+  let player1, player2, activePlayer, round;
 
   getPlayerDetails();
   beginGame();
@@ -94,6 +91,7 @@ const Game = (function () {
 
   function beginGame() {
     activePlayer = player1;
+    round = 0;
     beginRound();
   }
 
