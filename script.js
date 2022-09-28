@@ -45,7 +45,7 @@ const GameBoard = (function () {
     const index = element.dataset.position;
     gameBoardArray[index] = marker;
 
-    Game.isRoundOver(gameBoardArray);
+    Game.isRoundOver();
   }
 
   function getGameBoard() {
@@ -114,7 +114,9 @@ const Game = (function () {
     displayActivePlayer();
   }
 
-  function isRoundOver(arr) {
+  // invoked by GameBoard, when a player makes a move
+  function isRoundOver() {
+    const arr = GameBoard.getGameBoard();
     const xo = /[xo]/;
 
     if (
@@ -131,8 +133,10 @@ const Game = (function () {
       (arr[6].match(xo) && arr[2] === arr[4] && arr[4] === arr[6])
     ) {
       declareRoundWinner();
-    } else {
+    } else if (GameBoard.getGameBoard().some((i) => i === "")) {
       toggleActivePlayer();
+    } else {
+      declareRoundTie();
     }
   }
 
@@ -144,8 +148,6 @@ const Game = (function () {
     // display victory gui element / modal
     console.warn("Winner:", winner.getName());
 
-    updateScoreBoard();
-
     if (isGameOver()) {
       declareGameWinner();
     } else {
@@ -153,6 +155,13 @@ const Game = (function () {
       toggleActivePlayer();
       beginRound();
     }
+  }
+
+  function declareRoundTie() {
+    // display ui element/modal declaring tie
+    // wipe screen clean / animate somehow
+    console.log("It's a tie!");
+    beginRound();
   }
 
   function isGameOver() {
