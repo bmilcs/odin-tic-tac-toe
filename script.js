@@ -59,8 +59,14 @@ const GameBoard = (function () {
   };
 })();
 
+//
+// Game Flow Module
+//
+
 const Game = (function () {
   let player1, player2, activePlayer, round;
+  let player1Score = document.querySelector(".player1-score");
+  let player2Score = document.querySelector(".player2-score");
 
   getPlayerDetails();
   beginGame();
@@ -71,19 +77,34 @@ const Game = (function () {
     // if 1 player, automatically assign PC to player 2
     player1 = playerFactory("Bryan", "x");
     player2 = playerFactory("Joe", "o");
+    renderName(player1);
+    renderName(player2);
+  }
+
+  function renderName(player) {
+    player.getMarker() === "x"
+      ? (element = document.querySelector(".player1-name"))
+      : (element = document.querySelector(".player2-name"));
+    element.textContent = player.getName();
   }
 
   function beginGame() {
     activePlayer = player1;
     round = 0;
+    updateScoreBoard();
     beginRound();
   }
 
   function beginRound() {
-    GameBoard.reset();
     round += 1;
+    GameBoard.reset();
     console.log(`Round ${round}. Fight!`);
     displayActivePlayer();
+  }
+
+  function displayActivePlayer() {
+    // update gui to show whos turn it is
+    console.log(`Turn: ${activePlayer.getName()}`);
   }
 
   function toggleActivePlayer() {
@@ -91,11 +112,6 @@ const Game = (function () {
       ? (activePlayer = player2)
       : (activePlayer = player1);
     displayActivePlayer();
-  }
-
-  function displayActivePlayer() {
-    // update gui to show whos turn it is
-    console.log(`Turn: ${activePlayer.getName()}`);
   }
 
   function isRoundOver(arr) {
@@ -123,11 +139,12 @@ const Game = (function () {
   function declareRoundWinner() {
     const winner = getActivePlayer();
     winner.incrementScore();
+    updateScoreBoard();
 
     // display victory gui element / modal
     console.warn("Winner:", winner.getName());
 
-    updateScoreboard();
+    updateScoreBoard();
 
     if (isGameOver()) {
       declareGameWinner();
@@ -152,20 +169,16 @@ const Game = (function () {
     askPlayAgain();
   }
 
-  function updateScoreboard() {
-    // update elements = player1/2.getScore()
-    console.log(
-      player1.getName(),
-      player1.getScore(),
-      player2.getName(),
-      player2.getScore()
-    );
+  function updateScoreBoard() {
+    player1Score.textContent = player1.getScore();
+    player2Score.textContent = player2.getScore();
   }
 
   function resetScores() {
     // reset scoreboard dom elements
     player1.resetScore();
     player2.resetScore();
+    updateScoreBoard();
   }
 
   function askPlayAgain() {
