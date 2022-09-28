@@ -18,8 +18,7 @@
   --border-radius: 0.75rem;
   --box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
     rgba(0, 0, 0, 0.05) 0px 4px 6px -2px
-  --text-shadow: 0px 4px 3px hsla(0, 0%, 0%, 0.4),
-        0px 8px 13px hsla(0, 0%, 0%, 0.102), 0px 18px 23px hsla(0, 0%, 0%, 0.1);
+  --text-shadow: 5px 5px 0px rgba(0,0,0,0.2);
   --clr-neutral-900: #222629;
   --clr-neutral-800: hsl(206, 9%, 25%);
   --clr-neutral-700: #747b4f;
@@ -33,8 +32,10 @@ body {
   background: var(--clr-neutral-900);
   color: var(--clr-neutral-100);
   font-family: var(--ff-main);
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
   width: 100vw;
 }
@@ -45,7 +46,7 @@ header {
 header h1 {
   font-family: var(--ff-title);
   font-weight: var(--fw-regular);
-  font-size: min(8rem, 15vw);
+  font-size: min(6rem, 15vw);
   text-align: center;
   transition: all 0.3s ease-in-out;
 }
@@ -68,13 +69,12 @@ header p {
 }
 
 main {
-  place-self: start center;
   display: grid;
   margin-block: 5rem;
-  width: min(45rem, 90%);
+  flex-shrink: 0;
+  width: min(35rem, 90%);
   aspect-ratio: 1;
   background: var(--clr-neutral-800);
-  padding: 1rem;
 }
 
 #game-container {
@@ -90,9 +90,13 @@ main {
   height: 100%;
   width: 100%;
   background: var(--clr-neutral-900);
-  font-size: min(15vw, 9rem);
+  font-size: min(15vw, 8rem);
   font-weight: var(--fw-bold);
   text-transform: uppercase;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  -moz-user-select: none;
+       user-select: none; /* Standard syntax */
 }
 #game-container .square.x {
   color: var(--clr-neutral-100);
@@ -101,14 +105,40 @@ main {
   color: var(--clr-accent-100);
 }
 #game-container .square.enabled:hover {
+  cursor: pointer;
   background: var(--clr-neutral-800);
   box-shadow: 0px 0px 52px 2px var(--clr-neutral-900) inset;
   transition: all 0.2s ease-in-out;
-  text-shadow: var(--text-shadow);
 }
 #game-container .square.enabled:active {
   box-shadow: none;
   background: var(--clr-accent-300);
   color: var(--clr-neutral-900);
   transition: all 0.1s linear;
+}
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: -webkit-max-content 1fr 1fr -webkit-max-content;
+  grid-template-columns: max-content 1fr 1fr max-content;
+  place-items: center;
+  gap: 1rem;
+}
+.scoreboard .name {
+  font-weight: var(--fw-regular);
+  font-family: var(--ff-title);
+  font-size: 1.75rem;
+}
+.scoreboard .score {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  aspect-ratio: 1;
+  background: var(--clr-accent-300);
+  border-radius: 1rem;
+  font-size: 2.5rem;
+  text-shadow: var(--text-shadow);
+}
+.scoreboard.player1 {
+  flex-direction: row-reverse;
 }/*# sourceMappingURL=style.css.map */
