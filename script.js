@@ -1,4 +1,4 @@
-// store gameBoard array within gameBoard object
+// GameBoard is a modular, IIFE function, that handles the gameboard array & gui elements
 
 const GameBoard = (function () {
   const gameContainer = document.getElementById("game-container");
@@ -73,22 +73,6 @@ const Game = (function () {
     player2 = playerFactory("Joe", "o");
   }
 
-  function updateScoreboard() {
-    // update elements = player1/2.getScore()
-    console.log(
-      player1.getName(),
-      player1.getScore(),
-      player2.getName(),
-      player2.getScore()
-    );
-  }
-
-  function resetScores() {
-    player1.resetScore();
-    player2.resetScore();
-    // reset scoreboard dom elements
-  }
-
   function beginGame() {
     activePlayer = player1;
     round = 0;
@@ -98,10 +82,20 @@ const Game = (function () {
   function beginRound() {
     GameBoard.reset();
     round += 1;
-    // display player X's name
-    console.log(
-      `Round ${round} Begins. ${activePlayer.getName()} is up first!`
-    );
+    console.log(`Round ${round}. Fight!`);
+    displayActivePlayer();
+  }
+
+  function toggleActivePlayer() {
+    activePlayer === player1
+      ? (activePlayer = player2)
+      : (activePlayer = player1);
+    displayActivePlayer();
+  }
+
+  function displayActivePlayer() {
+    // update gui to show whos turn it is
+    console.log(`Turn: ${activePlayer.getName()}`);
   }
 
   function isRoundOver(arr) {
@@ -158,28 +152,32 @@ const Game = (function () {
     askPlayAgain();
   }
 
-  function toggleActivePlayer() {
-    activePlayer === player1
-      ? (activePlayer = player2)
-      : (activePlayer = player1);
-    displayActivePlayer();
+  function updateScoreboard() {
+    // update elements = player1/2.getScore()
+    console.log(
+      player1.getName(),
+      player1.getScore(),
+      player2.getName(),
+      player2.getScore()
+    );
   }
 
-  function displayActivePlayer() {
-    // update gui to show whos turn it is
-    console.log(`Turn: ${activePlayer.getName()}`);
+  function resetScores() {
+    // reset scoreboard dom elements
+    player1.resetScore();
+    player2.resetScore();
+  }
+
+  function askPlayAgain() {
+    // create gui element to ask if they want to play another round
+    console.log("Would you like to play again?");
+    // if yes
+    resetScores();
+    beginGame();
   }
 
   function getActivePlayer() {
     return activePlayer;
-  }
-
-  function askPlayAgain() {
-    console.log("Would you like to play again?");
-    // create gui element to ask if they want to play another round
-    // if yes
-    resetScores();
-    beginGame();
   }
 
   return {
