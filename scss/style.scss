@@ -19,8 +19,13 @@
 
   --border-radius: 0.75rem;
   --box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
-    rgba(0, 0, 0, 0.05) 0px 4px 6px -2px
-  --text-shadow: 5px 5px 0px rgba(0,0,0,0.2);
+    rgba(0, 0, 0, 0.05) 0px 4px 6px -2px;
+  --text-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
+
+  --transition-color: color 0.25s ease-in-out, background 0.25s ease-in-out;
+  --transition-all-quick: all 0.3s ease-in-out;
+  --transition-all-slow: all 1s ease-in-out;
+  --transition-opacity: opacity 1s ease-in-out;
 
   --clr-neutral-900: #222629;
   --clr-neutral-800: hsl(206, 9%, 25%);
@@ -40,6 +45,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 3rem;
 
   height: 100vh;
   width: 100vw;
@@ -47,13 +53,18 @@ body {
 
 header {
   line-height: 1;
+  opacity: 1;
+  transition: var(--transition-opacity);
+
   h1 {
     font-family: var(--ff-title);
     font-weight: var(--fw-regular);
     font-size: min(6rem, 15vw);
 
     text-align: center;
-    transition: all 0.3s ease-in-out;
+    transition: var(--transition-all-quick);
+
+    transition: var(--transition-all-quick);
 
     span {
       color: var(--clr-accent-100);
@@ -63,7 +74,7 @@ header {
       letter-spacing: 0.5rem;
       color: var(--clr-accent-100);
       text-shadow: var(--text-shadow);
-      transition: all 0.3s ease-in-out;
+      transition: var(--transition-all-quick);
 
       span {
         color: var(--clr-neutral-100);
@@ -78,21 +89,116 @@ header {
 }
 
 //
+// Game Menu
+//
+
+.game-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-inline: 1rem;
+  width: 45ch;
+
+  font-size: clamp(1rem, 4vw, 1.5rem);
+
+  opacity: 1;
+  transition: var(--transition-opacity);
+
+  p {
+    line-height: 1.7;
+  }
+
+  span,
+  p::first-letter {
+    font-weight: var(--fw-bold);
+    color: var(--clr-accent-100);
+  }
+
+  .input-container {
+    margin-block: 3rem;
+  }
+
+  label {
+    display: block;
+    align-self: start;
+
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+
+    font-size: 1rem;
+    font-weight: var(--fw-bold);
+  }
+
+  input {
+    padding: 0.5rem 0.75rem;
+
+    font: inherit;
+
+    border-radius: var(--border-radius);
+    border: 0;
+
+    background: var(--clr-neutral-800);
+    color: var(--clr-neutral-100);
+    transition: var(--transition-all-quick);
+  }
+
+  input:hover,
+  input:focus {
+    font-weight: var(--fw-bold);
+
+    color: var(--clr-accent-100);
+    background: var(--clr-neutral-900);
+
+    outline: var(--clr-accent-100) solid 0.15rem;
+
+    // transition: var(--transition-color);
+  }
+}
+
+button {
+  margin-block: 1rem;
+  padding: 0.75rem 1rem;
+
+  font-size: inherit;
+  font-weight: var(--fw-black);
+
+  border-radius: var(--border-radius);
+  border: 0;
+
+  background: var(--clr-neutral-100);
+  color: var(--clr-neutral-900);
+  transition: var(--transition-all-quick);
+}
+
+button:hover,
+button:focus {
+  cursor: pointer;
+  scale: 1.25;
+  background: var(--clr-accent-100);
+}
+
+button:active {
+  background: var(--clr-neutral-100);
+}
+
+//
 // Gameboard
 //
 
 main {
-  display: grid;
-  margin-block: 5rem;
   flex-shrink: 0;
+
+  display: grid;
+  margin-block: 1rem;
 
   width: min(35rem, 90%);
   aspect-ratio: 1;
 
   background: var(--clr-neutral-800);
-  // padding: 1rem;
 
-  // border-radius: var(--border-radius);
+  opacity: 1;
+  transition: var(--transition-opacity);
 }
 
 #game-container {
@@ -146,13 +252,16 @@ main {
 
 //
 // Scoreboard
-// 
+//
 
 .scoreboard {
   display: grid;
   grid-template-columns: max-content 1fr 1fr max-content;
   place-items: center;
   gap: 1rem;
+
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
 
   .name {
     font-weight: var(--fw-regular);
@@ -166,24 +275,24 @@ main {
 
     width: 4rem;
     aspect-ratio: 1;
-    
+
     border-radius: 1rem;
-    
+
     font-size: 2.5rem;
   }
 
   .player1-score {
     background: var(--clr-neutral-100);
     color: var(--clr-neutral-900);
- 
   }
 
   .player2-name {
     color: var(--clr-accent-100);
-   }
+  }
 
   .player2-score {
-    background: var(--clr-accent-300);
+    background: var(--clr-accent-100);
+    color: var(--clr-neutral-900);
   }
 
   &.player1 {
@@ -191,4 +300,20 @@ main {
   }
 }
 
- 
+//
+// Utility classes
+//
+
+.display-none {
+  display: none;
+}
+
+.opacity0 {
+  opacity: 0;
+  transition: var(--transition-all-slow);
+}
+
+// .opacity1 {
+//   opacity: 1;
+//   transition: var(--transition-all-slow);
+// }

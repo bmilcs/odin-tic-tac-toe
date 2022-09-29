@@ -11,16 +11,29 @@
   <body>
     <header>
       <h1>Tic<span>Tac</span>Toe</h1>
-      <p>Odin Project #9</p>
+      <p>the odin project #9</p>
     </header>
 
-    <main>
+    <section class="game-menu">
+      <p>
+        Welcome to Tic Tac Toe. You will be facing off against the computer in a
+        vicious battle of wits. First player to reach <span>3 points</span> wins
+        the game.
+      </p>
+      <div class="input-container">
+        <label for="name">Enter your name:</label>
+        <input type="text" id="name" required />
+      </div>
+      <button class="start-game-btn">Start Game</button>
+    </section>
+
+    <main class="gameboard display-none opacity0">
       <section id="game-container">
         <!-- rendered with javascript -->
       </section>
     </main>
 
-    <section class="scoreboard">
+    <section class="scoreboard display-none opacity0">
       <h3 class="name player1-name"></h3>
       <h2 class="score player1-score"></h2>
       <h2 class="score player2-score"></h2>

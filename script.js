@@ -65,23 +65,51 @@ const GameBoard = (function () {
 
 const Game = (function () {
   let player1, player2, activePlayer, round;
-  let player1Score = document.querySelector(".player1-score");
-  let player2Score = document.querySelector(".player2-score");
+  const header = document.querySelector("header"),
+    gameBoard = document.querySelector(".gameboard"),
+    scoreBoard = document.querySelector(".scoreboard"),
+    gameMenu = document.querySelector(".game-menu"),
+    nameInput = document.getElementById("name"),
+    startGameBtn = document.querySelector(".start-game-btn"),
+    player1Score = document.querySelector(".player1-score"),
+    player2Score = document.querySelector(".player2-score");
 
-  getPlayerDetails();
-  beginGame();
+  activateGameMenu();
 
-  function getPlayerDetails() {
-    // prompt user for # of players
-    // get user 1 & 2's name > create objects via player
-    // if 1 player, automatically assign PC to player 2
-    player1 = playerFactory("Bryan", "x");
-    player2 = playerFactory("Joe", "o");
+  function activateGameMenu() {
+    startGameBtn.addEventListener("click", gameMenuHandler);
+    window.addEventListener("keypress", gameMenuHandler);
+  }
+
+  function disableGameMenu() {
+    startGameBtn.removeEventListener("click", gameMenuHandler);
+    window.removeEventListener("keypress", gameMenuHandler);
+  }
+
+  function gameMenuHandler(e) {
+    // if enter was pressed OR button click triggered event:
+    if (e.detail === 0) {
+      if (e.key === "Enter") isNamePresent();
+    } else isNamePresent();
+
+    function isNamePresent() {
+      if (nameInput.checkValidity()) {
+        setPlayerDetails();
+        disableGameMenu();
+      }
+    }
+  }
+
+  function setPlayerDetails() {
+    player1 = playerFactory(nameInput.value, "x");
+    player2 = playerFactory("Robot", "o");
     renderName(player1);
     renderName(player2);
+    beginGame();
   }
 
   function renderName(player) {
+    console.log("HI");
     player.getMarker() === "x"
       ? (element = document.querySelector(".player1-name"))
       : (element = document.querySelector(".player2-name"));
@@ -89,6 +117,7 @@ const Game = (function () {
   }
 
   function beginGame() {
+    animateTransition();
     activePlayer = player1;
     round = 0;
     updateScoreBoard();
@@ -146,6 +175,8 @@ const Game = (function () {
     updateScoreBoard();
 
     // display victory gui element / modal
+    // animate winning line
+
     console.warn("Winner:", winner.getName());
 
     if (isGameOver()) {
@@ -200,6 +231,37 @@ const Game = (function () {
 
   function getActivePlayer() {
     return activePlayer;
+  }
+
+  function animateTransition() {
+    fadeOut(header);
+    fadeOut(gameMenu);
+
+    gameMenu.addEventListener("transitionend", () => {
+      header.classList.remove("display-none");
+      gameBoard.classList.remove("display-none");
+      scoreBoard.classList.remove("display-none");
+    });
+
+    setTimeout(() => {
+      header.classList.remove("opacity0");
+      setTimeout(() => {
+        gameBoard.classList.remove("opacity0");
+        setTimeout(() => {
+          scoreBoard.classList.remove("opacity0");
+        }, 1000);
+      }, 1000);
+    }, 1100);
+  }
+
+  function fadeOut(element) {
+    element.classList.add("opacity0");
+    element.addEventListener("transitionend", displayNone);
+
+    function displayNone(e) {
+      element.classList.add("display-none");
+      e.target.removeEventListener("transitionend", displayNone);
+    }
   }
 
   return {
