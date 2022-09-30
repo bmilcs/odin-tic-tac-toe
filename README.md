@@ -8,7 +8,9 @@ Welcome to Bryan Miller's Tic Tac Toe Project, the [ninth assignment](https://ww
   - The Module Pattern
   - Scope & Closure
   - Namespacing
-- HTML / CSS
+- HTML
+- CSS
+  - Transitions: Opacity & Display None
 
 ## Summary
 

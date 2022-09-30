@@ -72,7 +72,9 @@ const Game = (function () {
     nameInput = document.getElementById("name"),
     startGameBtn = document.querySelector(".start-game-btn"),
     player1Score = document.querySelector(".player1-score"),
-    player2Score = document.querySelector(".player2-score");
+    player2Score = document.querySelector(".player2-score"),
+    modal = document.querySelector(".modal"),
+    modalText = document.querySelector(".modal .text-container");
 
   activateGameMenu();
 
@@ -87,7 +89,7 @@ const Game = (function () {
   }
 
   function gameMenuHandler(e) {
-    // if enter was pressed OR button click triggered event:
+    // if enter was pressed OR click triggered event:
     if (e.detail === 0) {
       if (e.key === "Enter") isNamePresent();
     } else isNamePresent();
@@ -109,7 +111,6 @@ const Game = (function () {
   }
 
   function renderName(player) {
-    console.log("HI");
     player.getMarker() === "x"
       ? (element = document.querySelector(".player1-name"))
       : (element = document.querySelector(".player2-name"));
@@ -117,7 +118,7 @@ const Game = (function () {
   }
 
   function beginGame() {
-    animateTransition();
+    animateMenuTransition();
     activePlayer = player1;
     round = 0;
     updateScoreBoard();
@@ -233,25 +234,63 @@ const Game = (function () {
     return activePlayer;
   }
 
-  function animateTransition() {
+  function showModal(h3, h4 = "") {
+    modalText.firstElementChild.textContent = h3;
+    modalText.lastElementChild.textContent = h4;
+
+    fadeIn(modal);
+
+    doAfterTransition(modal, () => {
+      fadeIn(modalText.firstElementChild);
+      doAfterTransition(modalText.firstElementChild, () => {
+        fadeIn(modalText.lastElementChild);
+      });
+    });
+  }
+
+  function hideModal() {
+    fadeOut(modal);
+  }
+
+  function animateMenuTransition() {
     fadeOut(header);
     fadeOut(gameMenu);
 
-    gameMenu.addEventListener("transitionend", () => {
+    showModal("Are you ready?", "Round 1 begins now!");
+    doAfterTransition(modal, animateGame);
+
+    function animateGame() {
+      // Remove "display: none" so elements position themselves
+      // before opacity changes kick in (so they don't move things around)
       header.classList.remove("display-none");
       gameBoard.classList.remove("display-none");
       scoreBoard.classList.remove("display-none");
-    });
 
-    setTimeout(() => {
-      header.classList.remove("opacity0");
       setTimeout(() => {
-        gameBoard.classList.remove("opacity0");
+        fadeIn(header);
         setTimeout(() => {
-          scoreBoard.classList.remove("opacity0");
+          fadeIn(gameBoard);
+          setTimeout(() => {
+            fadeIn(scoreBoard);
+            setTimeout(() => {
+              fadeOut(modal);
+            }, 1500);
+          }, 1000);
         }, 1000);
       }, 1000);
-    }, 1100);
+    }
+  }
+
+  function doAfterTransition(waitOn, perform) {
+    waitOn.addEventListener("transitionend", perform, { once: true });
+  }
+
+  function fadeIn(element) {
+    element.classList.remove("display-none");
+
+    setTimeout(() => {
+      element.classList.remove("opacity0");
+    }, 100);
   }
 
   function fadeOut(element) {
@@ -259,12 +298,13 @@ const Game = (function () {
     element.addEventListener("transitionend", displayNone);
 
     function displayNone(e) {
-      element.classList.add("display-none");
+      e.target.classList.add("display-none");
       e.target.removeEventListener("transitionend", displayNone);
     }
   }
 
   return {
+    // Used by GameBoard() Module
     getActivePlayer,
     isRoundOver,
   };

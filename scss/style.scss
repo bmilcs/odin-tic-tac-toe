@@ -28,6 +28,7 @@
   --transition-opacity: opacity 1s ease-in-out;
 
   --clr-neutral-900: #222629;
+  --clr-neutral-900-trans: hsla(206, 9%, 15%, 75%);
   --clr-neutral-800: hsl(206, 9%, 25%);
   --clr-neutral-700: #747b4f;
   --clr-neutral-200: #6b6e70;
@@ -98,7 +99,7 @@ header {
   align-items: center;
 
   padding-inline: 1rem;
-  width: 45ch;
+  max-width: 45ch;
 
   font-size: clamp(1rem, 4vw, 1.5rem);
 
@@ -297,6 +298,49 @@ main {
 
   &.player1 {
     flex-direction: row-reverse;
+  }
+}
+
+//
+// Modal
+//
+
+.modal {
+  position: absolute;
+  display: grid;
+  place-items: center;
+
+  padding: 3rem;
+  width: 100vw;
+  height: 100vh;
+
+  backdrop-filter: blur(6px);
+  background: var(--clr-neutral-900-trans);
+
+  transition: var(--transition-all-slow);
+
+  .text-container {
+    text-align: center;
+    transition: var(--transition-all-slow);
+  }
+
+  h3 {
+    font-size: max(2rem, 8vw);
+    font-family: var(--ff-title);
+    font-weight: var(--fw-regular);
+    letter-spacing: 1px;
+
+    color: var(--clr-accent-100);
+
+    margin-bottom: 0.25rem;
+    transition: var(--transition-all-slow);
+  }
+
+  h4 {
+    font-family: var(--ff-title);
+    font-weight: var(--fw-regular);
+    font-size: max(1.5rem, 4vw);
+    transition: var(--transition-all-slow);
   }
 }
 
