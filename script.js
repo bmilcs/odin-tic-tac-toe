@@ -1,10 +1,11 @@
-// GameBoard is a modular, IIFE function, that handles the gameboard array & gui elements
+// GameBoard is a modular, IIFE function, that handles the gameboard array & elements
 
 const GameBoard = (function () {
   const gameContainer = document.getElementById("game-container");
   let gameBoardArray = ["", "", "", "", "", "", "", "", ""];
   const gameBoardElements = render();
 
+  // returns an array of html elements for each clickable square
   function render() {
     return gameBoardArray.map((value, i) => {
       const div = document.createElement("div");
@@ -15,8 +16,8 @@ const GameBoard = (function () {
     });
   }
 
+  // resets gameboard array & gameboard gui elements
   function reset() {
-    // reset array values
     for (let i = 0; i < gameBoardArray.length; i++) {
       gameBoardArray[i] = "";
     }
@@ -31,6 +32,7 @@ const GameBoard = (function () {
     });
   }
 
+  // callback function: invoked when square is clicked
   function selectSquare(e) {
     const element = e.target;
     element.removeEventListener("click", selectSquare);
@@ -39,12 +41,17 @@ const GameBoard = (function () {
     const activePlayer = Game.getActivePlayer();
     const marker = activePlayer.getMarker();
 
+    // classes "x" "o": add unique styles for each player
     element.classList.add(marker);
     element.textContent = marker;
 
+    // gameboard elements have [data-position] attr, which corresponds
+    // to their position in the gameboard array. the array
+    // is used to determine when a victory or tie takes place.
     const index = element.dataset.position;
     gameBoardArray[index] = marker;
 
+    // Game module handles flow of the game & game menu
     Game.isRoundOver();
   }
 
@@ -52,6 +59,7 @@ const GameBoard = (function () {
     return gameBoardArray;
   }
 
+  // global scope only has access to the following functions
   return {
     render,
     reset,
@@ -78,38 +86,46 @@ const Game = (function () {
 
   activateGameMenu();
 
+  // used on page first load & after a game is completed
   function activateGameMenu() {
+    // hides gameboard & scoreboard after game is done:
     gameBoard.classList.add("display-none");
     scoreBoard.classList.add("display-none");
     gameBoard.classList.add("opacity0");
     scoreBoard.classList.add("opacity0");
+
+    // fadeIn: removes "display: none" & adds utility class that
+    // has an opacity transition
     fadeIn(header);
     fadeIn(gameMenu);
 
-    startGameBtn.addEventListener("click", gameMenuHandler);
-    window.addEventListener("keypress", gameMenuHandler);
+    // enables button & enter key to start game
+    startGameBtn.addEventListener("click", startGameHandler);
+    window.addEventListener("keypress", startGameHandler);
   }
 
   function disableGameMenu() {
-    startGameBtn.removeEventListener("click", gameMenuHandler);
-    window.removeEventListener("keypress", gameMenuHandler);
+    startGameBtn.removeEventListener("click", startGameHandler);
+    window.removeEventListener("keypress", startGameHandler);
   }
 
-  function gameMenuHandler(e) {
-    // if enter was pressed OR click triggered event:
+  function startGameHandler(e) {
+    // if enter key OR click triggered event:
     if (e.detail === 0) {
       if (e.key === "Enter") isNamePresent();
     } else isNamePresent();
 
     function isNamePresent() {
       if (nameInput.checkValidity()) {
-        setPlayerDetails();
+        createPlayers();
         disableGameMenu();
       }
     }
   }
 
-  function setPlayerDetails() {
+  function createPlayers() {
+    // playerFactory() creates player objects, containing their
+    // name, score, marker & methods to retrieve them.
     player1 = playerFactory(nameInput.value, "x");
     player2 = playerFactory("Robot", "o");
     renderName(player1);
@@ -117,19 +133,34 @@ const Game = (function () {
     beginGame();
   }
 
+  // displays player names in scoreboard & stores name element in the
+  // player object
+  // @param: player object
   function renderName(player) {
     player.getMarker() === "x"
-      ? (element = document.querySelector(".player1-name"))
-      : (element = document.querySelector(".player2-name"));
-    element.textContent = player.getName();
+      ? (player.nameElement = document.querySelector(".player1-name"))
+      : (player.nameElement = document.querySelector(".player2-name"));
+
+    player.nameElement.textContent = player.getName();
   }
 
   function beginGame() {
-    animateMenuTransition();
     activePlayer = player1;
     round = 1;
+    resetScores();
     updateScoreBoard();
+    animateMenuTransition();
     beginRound();
+  }
+
+  function resetScores() {
+    player1.resetScore();
+    player2.resetScore();
+  }
+
+  function updateScoreBoard() {
+    player1Score.textContent = player1.getScore();
+    player2Score.textContent = player2.getScore();
   }
 
   function beginRound() {
@@ -138,8 +169,15 @@ const Game = (function () {
   }
 
   function displayActivePlayer() {
-    // update gui to show whos turn it is
-    console.log(`Turn: ${activePlayer.getName()}`);
+    inactivePlayer = getOtherPlayer(activePlayer);
+    inactivePlayer.nameElement.style.borderBottom = "none";
+
+    if (player1 === activePlayer)
+      activePlayer.nameElement.style.borderBottom =
+        "3px var(--clr-neutral-100) solid";
+    else
+      activePlayer.nameElement.style.borderBottom =
+        "3px var(--clr-accent-100) solid";
   }
 
   function toggleActivePlayer() {
@@ -177,6 +215,8 @@ const Game = (function () {
 
   function declareRoundWinner() {
     const winner = getActivePlayer();
+    const loser = getOtherPlayer(winner);
+
     winner.incrementScore();
     updateScoreBoard();
 
@@ -185,7 +225,7 @@ const Game = (function () {
     } else {
       showModal(
         `${winner.getName()} takes round #${round}!`,
-        `Up Next: Round #${++round}`
+        `${loser.getName()} begins round #${++round}`
       );
       setTimeout(() => {
         hideModal();
@@ -194,6 +234,11 @@ const Game = (function () {
         beginRound();
       }, 5000);
     }
+  }
+
+  function getOtherPlayer(player) {
+    if (player.getName() === player1.getName()) return player2;
+    else return player1;
   }
 
   function isGameOver() {
@@ -222,20 +267,7 @@ const Game = (function () {
 
   function returnToGameMenu() {
     hideModal();
-    resetScores();
     activateGameMenu();
-  }
-
-  function updateScoreBoard() {
-    player1Score.textContent = player1.getScore();
-    player2Score.textContent = player2.getScore();
-  }
-
-  function resetScores() {
-    // reset scoreboard dom elements
-    player1.resetScore();
-    player2.resetScore();
-    updateScoreBoard();
   }
 
   function getActivePlayer() {

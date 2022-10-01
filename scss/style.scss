@@ -107,6 +107,7 @@ header {
   transition: var(--transition-opacity);
 
   p {
+    text-align: center;
     line-height: 1.7;
   }
 
@@ -259,7 +260,6 @@ main {
   display: grid;
   grid-template-columns: max-content 1fr 1fr max-content;
   place-items: center;
-  gap: 1rem;
 
   opacity: 1;
   transition: opacity 1s ease-in-out;
@@ -268,6 +268,11 @@ main {
     font-weight: var(--fw-regular);
     font-family: var(--ff-title);
     font-size: 1.75rem;
+
+    padding-inline: 0.25em;
+    margin-inline: 0.125em;
+
+    transition: var(--transition-all-quick);
   }
 
   .score {
@@ -276,6 +281,8 @@ main {
 
     width: 4rem;
     aspect-ratio: 1;
+
+    margin-inline: 0.125em;
 
     border-radius: 1rem;
 
@@ -325,7 +332,7 @@ main {
   }
 
   h3 {
-    font-size: max(2rem, 8vw);
+    font-size: max(2rem, 5vw);
     font-family: var(--ff-title);
     font-weight: var(--fw-regular);
     letter-spacing: 1px;
@@ -339,7 +346,7 @@ main {
   h4 {
     font-family: var(--ff-title);
     font-weight: var(--fw-regular);
-    font-size: max(1.5rem, 4vw);
+    font-size: max(1.5rem, 3vw);
     transition: var(--transition-all-slow);
   }
 }

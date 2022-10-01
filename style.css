@@ -88,6 +88,7 @@ header p {
   transition: var(--transition-opacity);
 }
 .game-menu p {
+  text-align: center;
   line-height: 1.7;
 }
 .game-menu span,
@@ -202,7 +203,6 @@ main {
   grid-template-columns: -webkit-max-content 1fr 1fr -webkit-max-content;
   grid-template-columns: max-content 1fr 1fr max-content;
   place-items: center;
-  gap: 1rem;
   opacity: 1;
   transition: opacity 1s ease-in-out;
 }
@@ -210,12 +210,16 @@ main {
   font-weight: var(--fw-regular);
   font-family: var(--ff-title);
   font-size: 1.75rem;
+  padding-inline: 0.25em;
+  margin-inline: 0.125em;
+  transition: var(--transition-all-quick);
 }
 .scoreboard .score {
   display: grid;
   place-items: center;
   width: 4rem;
   aspect-ratio: 1;
+  margin-inline: 0.125em;
   border-radius: 1rem;
   font-size: 2.5rem;
 }
@@ -251,7 +255,7 @@ main {
   transition: var(--transition-all-slow);
 }
 .modal h3 {
-  font-size: max(2rem, 8vw);
+  font-size: max(2rem, 5vw);
   font-family: var(--ff-title);
   font-weight: var(--fw-regular);
   letter-spacing: 1px;
@@ -262,7 +266,7 @@ main {
 .modal h4 {
   font-family: var(--ff-title);
   font-weight: var(--fw-regular);
-  font-size: max(1.5rem, 4vw);
+  font-size: max(1.5rem, 3vw);
   transition: var(--transition-all-slow);
 }
 
