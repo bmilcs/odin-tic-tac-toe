@@ -3,9 +3,8 @@
 Welcome to Bryan Miller's Tic Tac Toe Project, the [ninth assignment](https://www.theodinproject.com/lessons/node-path-javascript-tic-tac-toe) within the Odin Project curriculum. The goal of this repo is to practice the following skill sets:
 
 - JavaScript
+  - Module Design Pattern
   - Factory Functions
-  - Inheritance: Destructuring Syntax
-  - The Module Pattern
   - Scope & Closure
   - Namespacing
 - HTML
@@ -14,7 +13,43 @@ Welcome to Bryan Miller's Tic Tac Toe Project, the [ninth assignment](https://ww
 
 ## Summary
 
-In progress.
+Modular design pattern & factory functions were the core lessons practiced in this project and I have to say that I'm a huge fan. Modular design allows us to keep the global namespace tidy and selectively allow variables & methods to poke through, much like a firewall whitelist, is extremely handy. Factory functions, an alternative to constructor functions, eliminate the use of the `new` keyword and allow us to explicitly define how our objects are to behave.
+
+Tic Tac Toe, as simple of a game as it is, is a fantastic project to practice the above skills. Here's how it works:
+
+### `GameBoard` Module
+
+The `GameBoard` module is responsible for keeping track the gameboard (`gameBoardArray`), displaying it on page (`render()`, `reset()`) and controlling interactivity with its clickable squares (`EventHandlers` & the `selectSquare` callback function). The `GameBoard` restricts public access to 3 things, preventing write access to any of its variables:
+
+- `getGameBoard()` (returns the array),
+- `render()`
+- `reset()` functions
+
+The `GameBoard` is useless, until a square is clicked. From there, it reaches out to the `Game` flow module and finds out which marker to place down and to determine if any winners are present.
+
+### `Game` Flow Module
+
+The `Game` Flow module contains the bulk of the functionality of this project. It:
+
+1. Creates the player objects via the `playerFactory()` factory function
+2. Contains the html elements & functions that control the `gameMenu`
+3. Controls the flow of the game itself & `scoreBoard`
+4. Handles & animates transitions between screens
+   1. The `modal` alerts the user when a game has concluded via a win, tie, etc.
+
+The beauty of the `Revealing Module Pattern` is that all of this is done privately in an `IIFE`, or immediately invoked function expression. Nothing is pubcicly accessible from the `Game` module, except for two functions: `getActivePlayer()` and `isRoundOver()`, which are used by the `GameBoard` when a click on the board is made.
+
+### `playerFactory` Factory Function
+
+Lastly, the `playerFactory()` Factory Function is responsible for creating player objects. These objects contain:
+
+- Player's name
+- Player's marker
+- Player's score
+- Functions for getting name, marker, score (preventing direct manipulation)
+- Functions for incrementing score & resetting score
+
+In summary, this was a fantastic project that taught me the magic of the `transitionend` event and the `{once: true}` option for events. They allowed me to minimize the number of active `EventListeners`, keeping resource consumption low.
 
 ## Links
 
