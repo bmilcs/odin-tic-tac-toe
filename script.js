@@ -266,7 +266,7 @@ const Game = (function () {
     fadeOut(header);
     fadeOut(gameMenu);
 
-    showModal("Are you ready?", "Round 1 begins now!");
+    showModal("Are you ready?", "PS: You play as the robot, too :)");
     doAfterTransition(modal, animateGame);
 
     function animateGame() {
