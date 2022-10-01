@@ -314,7 +314,10 @@ const Game = (function () {
     fadeOut(header);
     fadeOut(gameMenu);
 
-    showModal("Are you ready?", "PS: You play as the robot, too :)");
+    showModal(
+      `Are you ready, ${player1.getName()}?`,
+      "PS: You play as the robot, too :)"
+    );
     doAfterTransition(modal, animateGameBoard);
 
     function animateGameBoard() {
@@ -372,7 +375,7 @@ const Game = (function () {
     return activePlayer;
   }
 
-  // global scope accessible functions, used by GameBoard module:
+  // global scope accessible functions, used by GameBoard:
   return {
     getActivePlayer,
     isRoundOver,
@@ -382,7 +385,8 @@ const Game = (function () {
 // Function Factory:
 
 function playerFactory(playerName, OX) {
-  const _name = playerName;
+  // Capitalize 1st letter of playerName
+  const _name = playerName.charAt(0).toUpperCase() + playerName.slice(1);
   const _marker = OX;
   let _score = 0;
 
