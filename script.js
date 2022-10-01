@@ -168,6 +168,7 @@ const Game = (function () {
     displayActivePlayer();
   }
 
+  // Adds underline effect to show who's turn it is
   function displayActivePlayer() {
     inactivePlayer = getOtherPlayer(activePlayer);
     inactivePlayer.nameElement.style.borderBottom = "none";
@@ -180,6 +181,14 @@ const Game = (function () {
         "3px var(--clr-accent-100) solid";
   }
 
+  // Returns the inverse of a player object
+  // @param player object
+  // @return other player object
+  function getOtherPlayer(player) {
+    if (player.getName() === player1.getName()) return player2;
+    else return player1;
+  }
+
   function toggleActivePlayer() {
     activePlayer === player1
       ? (activePlayer = player2)
@@ -187,10 +196,11 @@ const Game = (function () {
     displayActivePlayer();
   }
 
-  // invoked by GameBoard, when a player makes a move
+  // invoked by GameBoard module, when a player makes a move (clicks on a square)
   function isRoundOver() {
-    const arr = GameBoard.getGameBoard();
+    // regex: matches "x" or "o"
     const xo = /[xo]/;
+    const arr = GameBoard.getGameBoard();
 
     if (
       // horizontal line wins:
@@ -205,10 +215,14 @@ const Game = (function () {
       (arr[0].match(xo) && arr[0] === arr[4] && arr[4] === arr[8]) ||
       (arr[6].match(xo) && arr[2] === arr[4] && arr[4] === arr[6])
     ) {
+      // if one of the winning combos are all equal to one another
+      // and contain an "x" or "o" -- ie: not blank:
       declareRoundWinner();
     } else if (GameBoard.getGameBoard().some((i) => i === "")) {
+      // not a win & there are empty spaces on the board:
       toggleActivePlayer();
     } else {
+      // not a win, no empty spaces left:
       declareRoundTie();
     }
   }
@@ -221,12 +235,15 @@ const Game = (function () {
     updateScoreBoard();
 
     if (isGameOver()) {
-      declareGameWinner();
+      // a player has reached 3 wins
+      declareGameWinner(winner);
     } else {
+      // display winner & increment round
       showModal(
         `${winner.getName()} takes round #${round}!`,
         `${loser.getName()} begins round #${++round}`
       );
+
       setTimeout(() => {
         hideModal();
         // let loser go first in next round
@@ -236,11 +253,7 @@ const Game = (function () {
     }
   }
 
-  function getOtherPlayer(player) {
-    if (player.getName() === player1.getName()) return player2;
-    else return player1;
-  }
-
+  // @return: true, if either player has reached 3 wins.
   function isGameOver() {
     if (player1.getScore() === 3 || player2.getScore() === 3) return true;
   }
@@ -254,10 +267,8 @@ const Game = (function () {
     }, 4000);
   }
 
-  function declareGameWinner() {
-    let winner;
-    player1.getScore() === 3 ? (winner = player1) : (winner = player2);
-
+  // @param: player object -- ie: the 1st to reach 3 wins
+  function declareGameWinner(winner) {
     showModal(`${winner.getName()} wins the game!!`, `Thanks for playing :)`);
 
     setTimeout(() => {
@@ -270,40 +281,45 @@ const Game = (function () {
     activateGameMenu();
   }
 
-  function getActivePlayer() {
-    return activePlayer;
-  }
-
+  // modal is used to display wins/ties/etc. between rounds
+  // @params: h3 & h4 text
   function showModal(h3, h4 = "") {
     modalText.firstElementChild.textContent = h3;
     modalText.lastElementChild.textContent = h4;
 
     fadeIn(modal);
 
+    // doAfterTransition: waits for transition end of 1st parameter (element)
+    // & executes the second parameter (function)
     doAfterTransition(modal, () => {
+      // after modal transition ends (blurred background), fadeIn(h3)
       fadeIn(modalText.firstElementChild);
       doAfterTransition(modalText.firstElementChild, () => {
+        // after h3 transition ends (blurred background), fadeIn(h4)
         fadeIn(modalText.lastElementChild);
       });
     });
   }
 
+  // hides the entire modal
+  // resets h3 / h4 to opacity: 0 for future fadeIn() transitions
   function hideModal() {
     fadeOut(modal);
     modalText.firstElementChild.classList.add("opacity0");
     modalText.lastElementChild.classList.add("opacity0");
   }
 
+  // animates transition from game menu to round #1
   function animateMenuTransition() {
     fadeOut(header);
     fadeOut(gameMenu);
 
     showModal("Are you ready?", "PS: You play as the robot, too :)");
-    doAfterTransition(modal, animateGame);
+    doAfterTransition(modal, animateGameBoard);
 
-    function animateGame() {
-      // Remove "display: none" so elements position themselves
-      // before opacity changes kick in (so they don't move things around)
+    function animateGameBoard() {
+      // Remove "display: none" so elements position themselves while invisible,
+      // before opacity tranisitions kick in (prevents abrupt position shifts)
       header.classList.remove("display-none");
       gameBoard.classList.remove("display-none");
       scoreBoard.classList.remove("display-none");
@@ -323,10 +339,16 @@ const Game = (function () {
     }
   }
 
-  function doAfterTransition(waitOn, perform) {
-    waitOn.addEventListener("transitionend", perform, { once: true });
+  // utility function for timing transitions:
+  // @params: html element to wait for & function to execute once transition is done
+  function doAfterTransition(elementToWaitOn, callbackFunction) {
+    elementToWaitOn.addEventListener("transitionend", callbackFunction, {
+      once: true,
+    });
   }
 
+  // utility function for animating the fade in effect
+  // @param: html element
   function fadeIn(element) {
     element.classList.remove("display-none");
 
@@ -335,18 +357,23 @@ const Game = (function () {
     }, 100);
   }
 
+  // utility function for animating the fade out effect
+  // @param: html element
   function fadeOut(element) {
     element.classList.add("opacity0");
-    element.addEventListener("transitionend", displayNone);
 
-    function displayNone(e) {
+    doAfterTransition(element, () => {
       element.classList.add("display-none");
-      element.removeEventListener("transitionend", displayNone);
-    }
+    });
   }
 
+  // used by GameBoard to determine which mark to place on the board
+  function getActivePlayer() {
+    return activePlayer;
+  }
+
+  // global scope accessible functions, used by GameBoard module:
   return {
-    // Used by GameBoard() Module
     getActivePlayer,
     isRoundOver,
   };
