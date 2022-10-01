@@ -71,11 +71,6 @@ header h1:hover {
 header h1:hover span {
   color: var(--clr-neutral-100);
 }
-header p {
-  color: var(--clr-neutral-200);
-  font-weight: var(--fw-regular);
-  text-align: center;
-}
 
 .game-menu {
   display: flex;
@@ -122,6 +117,33 @@ header p {
   color: var(--clr-accent-100);
   background: var(--clr-neutral-900);
   outline: var(--clr-accent-100) solid 0.15rem;
+}
+.game-menu .git {
+  margin-top: 0.5rem;
+}
+.game-menu .git a,
+.game-menu .git a:visited {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+  cursor: pointer;
+  fill: var(--clr-neutral-800);
+  color: var(--clr-neutral-800);
+  transition: var(--transition-all-quick);
+}
+.game-menu .git a:hover,
+.game-menu .git a:active {
+  color: var(--clr-accent-100);
+  fill: var(--clr-accent-100);
+}
+.game-menu .git h5 {
+  font-weight: var(--fw-regular);
+  font-size: 1.25rem;
+}
+.game-menu .git svg {
+  height: 1.5rem;
 }
 
 button {

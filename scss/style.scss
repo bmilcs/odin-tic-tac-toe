@@ -82,11 +82,6 @@ header {
       }
     }
   }
-  p {
-    color: var(--clr-neutral-200);
-    font-weight: var(--fw-regular);
-    text-align: center;
-  }
 }
 
 //
@@ -153,8 +148,40 @@ header {
     background: var(--clr-neutral-900);
 
     outline: var(--clr-accent-100) solid 0.15rem;
+  }
 
-    // transition: var(--transition-color);
+  .git {
+    margin-top: 0.5rem;
+
+    a,
+    a:visited {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.25rem;
+
+      text-decoration: none;
+      cursor: pointer;
+
+      fill: var(--clr-neutral-800);
+      color: var(--clr-neutral-800);
+      transition: var(--transition-all-quick);
+    }
+
+    a:hover,
+    a:active {
+      color: var(--clr-accent-100);
+      fill: var(--clr-accent-100);
+    }
+
+    h5 {
+      font-weight: var(--fw-regular);
+      font-size: 1.25rem;
+    }
+
+    svg {
+      height: 1.5rem;
+    }
   }
 }
 
