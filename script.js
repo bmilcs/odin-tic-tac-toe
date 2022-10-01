@@ -79,6 +79,13 @@ const Game = (function () {
   activateGameMenu();
 
   function activateGameMenu() {
+    gameBoard.classList.add("display-none");
+    scoreBoard.classList.add("display-none");
+    gameBoard.classList.add("opacity0");
+    scoreBoard.classList.add("opacity0");
+    fadeIn(header);
+    fadeIn(gameMenu);
+
     startGameBtn.addEventListener("click", gameMenuHandler);
     window.addEventListener("keypress", gameMenuHandler);
   }
@@ -120,15 +127,13 @@ const Game = (function () {
   function beginGame() {
     animateMenuTransition();
     activePlayer = player1;
-    round = 0;
+    round = 1;
     updateScoreBoard();
     beginRound();
   }
 
   function beginRound() {
-    round += 1;
     GameBoard.reset();
-    console.log(`Round ${round}. Fight!`);
     displayActivePlayer();
   }
 
@@ -175,39 +180,50 @@ const Game = (function () {
     winner.incrementScore();
     updateScoreBoard();
 
-    // display victory gui element / modal
-    // animate winning line
-
-    console.warn("Winner:", winner.getName());
-
     if (isGameOver()) {
       declareGameWinner();
     } else {
-      // let loser go first in next round
-      toggleActivePlayer();
-      beginRound();
+      showModal(
+        `${winner.getName()} takes round #${round}!`,
+        `Up Next: Round #${++round}`
+      );
+      setTimeout(() => {
+        hideModal();
+        // let loser go first in next round
+        toggleActivePlayer();
+        beginRound();
+      }, 5000);
     }
-  }
-
-  function declareRoundTie() {
-    // display ui element/modal declaring tie
-    // wipe screen clean / animate somehow
-    console.log("It's a tie!");
-    beginRound();
   }
 
   function isGameOver() {
     if (player1.getScore() === 3 || player2.getScore() === 3) return true;
   }
 
+  function declareRoundTie() {
+    showModal(`It's a tie! `, `Repeating Round #${round}`);
+
+    setTimeout(() => {
+      hideModal();
+      beginRound();
+    }, 4000);
+  }
+
   function declareGameWinner() {
     let winner;
     player1.getScore() === 3 ? (winner = player1) : (winner = player2);
 
-    // display gui element for winner of 3 round game
-    console.warn(`${winner.getName()} is the winner of 3 rounds!`);
+    showModal(`${winner.getName()} wins the game!!`, `Thanks for playing :)`);
 
-    askPlayAgain();
+    setTimeout(() => {
+      returnToGameMenu();
+    }, 5000);
+  }
+
+  function returnToGameMenu() {
+    hideModal();
+    resetScores();
+    activateGameMenu();
   }
 
   function updateScoreBoard() {
@@ -220,14 +236,6 @@ const Game = (function () {
     player1.resetScore();
     player2.resetScore();
     updateScoreBoard();
-  }
-
-  function askPlayAgain() {
-    // create gui element to ask if they want to play another round
-    console.log("Would you like to play again?");
-    // if yes
-    resetScores();
-    beginGame();
   }
 
   function getActivePlayer() {
@@ -250,6 +258,8 @@ const Game = (function () {
 
   function hideModal() {
     fadeOut(modal);
+    modalText.firstElementChild.classList.add("opacity0");
+    modalText.lastElementChild.classList.add("opacity0");
   }
 
   function animateMenuTransition() {
@@ -273,7 +283,7 @@ const Game = (function () {
           setTimeout(() => {
             fadeIn(scoreBoard);
             setTimeout(() => {
-              fadeOut(modal);
+              hideModal();
             }, 1500);
           }, 1000);
         }, 1000);
@@ -298,8 +308,8 @@ const Game = (function () {
     element.addEventListener("transitionend", displayNone);
 
     function displayNone(e) {
-      e.target.classList.add("display-none");
-      e.target.removeEventListener("transitionend", displayNone);
+      element.classList.add("display-none");
+      element.removeEventListener("transitionend", displayNone);
     }
   }
 
