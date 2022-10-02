@@ -31,7 +31,7 @@ The `GameBoard` restricts global access to `get()` & `reset()`.
 
 The `GameBoard` on its own is useless, until a square is clicked. From there, it reaches out to the `Game` flow module, whos responsibility is to find out who's turn it is, which marker to display and if a winner is present.
 
-### DisplayController
+### DisplayController Module
 
 The `DisplayController` module is responsible for:
 
