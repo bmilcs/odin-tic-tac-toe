@@ -1,26 +1,33 @@
-// GameBoard is a modular, IIFE function, that handles the gameboard array & elements
+//
+// GameBoard: a modular, IIFE function, that handles the gameboard array & elements
+//
 
 const GameBoard = (function () {
-  let gameBoardArray = Array(9).fill("");
-  const gameBoardElements = render();
+  let _boardArray = Array(9).fill("");
 
-  // returns an array of html elements for each clickable square
-  function render() {
+  // @return: an array of html elements for each clickable square
+  const render = () => {
     const gameContainer = document.getElementById("game-container");
-    return gameBoardArray.map((value, i) => {
+
+    return _boardArray.map((value, i) => {
       const div = document.createElement("div");
       div.classList.add("square");
       div.setAttribute("data-position", i);
       gameContainer.appendChild(div);
       return div;
     });
-  }
+  };
 
-  // resets gameboard array & gameboard gui elements
-  function reset() {
-    gameBoardArray = Array(9).fill("");
+  const reset = () => {
+    resetArray();
+    resetSquares();
+  };
 
-    // reset gui elements
+  const resetArray = () => {
+    _boardArray = Array(9).fill("");
+  };
+
+  const resetSquares = () => {
     gameBoardElements.forEach((square) => {
       square.textContent = "";
       square.classList.remove("x");
@@ -28,48 +35,97 @@ const GameBoard = (function () {
       square.classList.add("enabled");
       square.addEventListener("click", selectSquare);
     });
-  }
+  };
 
   // callback function: invoked when square is clicked
-  function selectSquare(e) {
+  const selectSquare = (e) => {
     const element = e.target;
-    element.removeEventListener("click", selectSquare);
-    element.classList.remove("enabled");
-
     const activePlayer = Game.getActivePlayer();
     const marker = activePlayer.getMarker();
 
-    // classes "x" "o": add unique styles for each player
-    element.classList.add(marker);
-    element.textContent = marker;
-
+    disableSquare(element);
+    markSquare(element, marker);
+    markArray(element.dataset.position, marker);
     // gameboard elements have [data-position] attr, which corresponds
     // to their position in the gameboard array. the array
     // is used to determine when a victory or tie takes place.
-    const index = element.dataset.position;
-    gameBoardArray[index] = marker;
 
     // Game module handles flow of the game & game menu
     Game.isRoundOver();
-  }
+  };
 
-  function getGameBoard() {
-    return gameBoardArray;
-  }
+  const disableSquare = (element) => {
+    element.removeEventListener("click", selectSquare);
+    element.classList.remove("enabled");
+  };
+
+  const markSquare = (element, marker) => {
+    // classes "x" "o": add unique styles for each player
+    element.classList.add(marker);
+    element.textContent = marker;
+  };
+
+  const markArray = (index, marker) => {
+    _boardArray[index] = marker;
+  };
+
+  const get = () => {
+    return _boardArray;
+  };
+
+  const gameBoardElements = render();
 
   // global scope only has access to the following functions
   return {
-    render,
     reset,
-    getGameBoard,
+    get,
   };
 })();
+
+//
+// Function Factory: creates player objects
+//
+
+const playerFactory = (playerName, OX) => {
+  // Capitalize 1st letter of playerName
+  const _name = playerName.charAt(0).toUpperCase() + playerName.slice(1);
+  const _marker = OX;
+  let _score = 0;
+
+  function incrementScore() {
+    _score += 1;
+  }
+
+  function resetScore() {
+    _score = 0;
+  }
+
+  function getName() {
+    return _name;
+  }
+
+  function getScore() {
+    return _score;
+  }
+
+  function getMarker() {
+    return _marker;
+  }
+
+  return {
+    getName,
+    getMarker,
+    getScore,
+    incrementScore,
+    resetScore,
+  };
+};
 
 //
 // Game Flow Module
 //
 
-const Game = (function () {
+const Game = (() => {
   let player1, player2, activePlayer, round;
   const header = document.querySelector("header"),
     gameBoard = document.querySelector(".gameboard"),
@@ -199,7 +255,7 @@ const Game = (function () {
   function isRoundOver() {
     // regex: matches "x" or "o"
     const xo = /[xo]/;
-    const arr = GameBoard.getGameBoard();
+    const arr = GameBoard.get();
 
     if (
       // horizontal line wins:
@@ -217,7 +273,7 @@ const Game = (function () {
       // if one of the winning combos are all equal to one another
       // and contain an "x" or "o" -- ie: not blank:
       declareRoundWinner();
-    } else if (GameBoard.getGameBoard().some((i) => i === "")) {
+    } else if (GameBoard.get().some((i) => i === "")) {
       // not a win & there are empty spaces on the board:
       toggleActivePlayer();
     } else {
@@ -381,39 +437,4 @@ const Game = (function () {
   };
 })();
 
-// Function Factory:
-
-function playerFactory(playerName, OX) {
-  // Capitalize 1st letter of playerName
-  const _name = playerName.charAt(0).toUpperCase() + playerName.slice(1);
-  const _marker = OX;
-  let _score = 0;
-
-  function incrementScore() {
-    _score += 1;
-  }
-
-  function resetScore() {
-    _score = 0;
-  }
-
-  function getName() {
-    return _name;
-  }
-
-  function getScore() {
-    return _score;
-  }
-
-  function getMarker() {
-    return _marker;
-  }
-
-  return {
-    getName,
-    getMarker,
-    getScore,
-    incrementScore,
-    resetScore,
-  };
-}
+const displayController = (() => {})();
