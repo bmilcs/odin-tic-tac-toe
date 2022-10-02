@@ -27,9 +27,11 @@ The `GameBoard` module is responsible for:
 - Resetting the gameboard elements & array: `reset()`
 - Controlling interactivity with its clickable squares: `EventHandlers` & the `selectSquare` callback function
 
-The `GameBoard` restricts global access to `get()`, `render()` and `reset()`.
+The `GameBoard` restricts global access to `get()` & `reset()`.
 
 The `GameBoard` on its own is useless, until a square is clicked. From there, it reaches out to the `Game` flow module, whos responsibility is to find out who's turn it is, which marker to display and if a winner is present.
+
+### Display
 
 ### Game Flow Module
 

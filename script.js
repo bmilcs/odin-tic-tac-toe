@@ -86,7 +86,7 @@ const GameBoard = (() => {
 // Display Controller Module: handles animation & gui elements
 //
 
-const displayController = (() => {
+const DisplayController = (() => {
   //
   // utility functions
   //
@@ -265,15 +265,15 @@ const displayController = (() => {
 const Game = (() => {
   let _player1, _player2, _activePlayer, _round;
 
-  displayController.displayGameMenu();
+  DisplayController.displayGameMenu();
 
   const createPlayers = (name) => {
     // playerFactory() creates player objects, containing their
     // name, score, marker & methods to retrieve them.
     _player1 = playerFactory(name, "x");
     _player2 = playerFactory("Robot", "o");
-    displayController.renderName(_player1);
-    displayController.renderName(_player2);
+    DisplayController.renderName(_player1);
+    DisplayController.renderName(_player2);
     beginGame();
   };
 
@@ -281,11 +281,11 @@ const Game = (() => {
     _activePlayer = _player1;
     _round = 1;
     resetScores();
-    displayController.updateScoreBoard(
+    DisplayController.updateScoreBoard(
       _player1.getScore(),
       _player2.getScore()
     );
-    displayController.animateMenuTransition(_player1.getName());
+    DisplayController.animateMenuTransition(_player1.getName());
     beginRound();
   };
 
@@ -369,7 +369,7 @@ const Game = (() => {
     const loser = getOtherPlayer(winner);
 
     winner.incrementScore();
-    displayController.updateScoreBoard(
+    DisplayController.updateScoreBoard(
       _player1.getScore(),
       _player2.getScore()
     );
@@ -379,13 +379,13 @@ const Game = (() => {
       declareGameWinner(winner);
     } else {
       // display round winner & increment round #
-      displayController.showModal(
+      DisplayController.showModal(
         `${winner.getName()} takes round #${_round}!`,
         `${loser.getName()} begins round #${++_round}`
       );
 
       setTimeout(() => {
-        displayController.hideModal();
+        DisplayController.hideModal();
         // let loser go first in next round
         toggleActivePlayer();
         beginRound();
@@ -394,24 +394,24 @@ const Game = (() => {
   };
 
   const declareRoundTie = () => {
-    displayController.showModal(`It's a tie!`, `Repeating Round #${_round}`);
+    DisplayController.showModal(`It's a tie!`, `Repeating Round #${_round}`);
 
     setTimeout(() => {
-      displayController.hideModal();
+      DisplayController.hideModal();
       beginRound();
     }, 4000);
   };
 
   // @param: player object -- ie: the 1st to reach 3 wins
   const declareGameWinner = (winner) => {
-    displayController.showModal(
+    DisplayController.showModal(
       `${winner.getName()} wins the game!!`,
       `Thanks for playing :)`
     );
 
     setTimeout(() => {
-      displayController.hideModal();
-      displayController.displayGameMenu();
+      DisplayController.hideModal();
+      DisplayController.displayGameMenu();
     }, 5000);
   };
 
