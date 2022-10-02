@@ -2,14 +2,14 @@
 // GameBoard: a modular, IIFE function, that handles the gameboard array & elements
 //
 
-const GameBoard = (function () {
+const GameBoard = (() => {
   let _boardArray = Array(9).fill("");
 
   // @return: an array of html elements for each clickable square
   const render = () => {
     const gameContainer = document.getElementById("game-container");
 
-    return _boardArray.map((value, i) => {
+    return _boardArray.map((x, i) => {
       const div = document.createElement("div");
       div.classList.add("square");
       div.setAttribute("data-position", i);
@@ -33,12 +33,12 @@ const GameBoard = (function () {
       square.classList.remove("x");
       square.classList.remove("o");
       square.classList.add("enabled");
-      square.addEventListener("click", selectSquare);
+      square.addEventListener("click", clickSquare);
     });
   };
 
   // callback function: invoked when square is clicked
-  const selectSquare = (e) => {
+  const clickSquare = (e) => {
     const element = e.target;
     const activePlayer = Game.getActivePlayer();
     const marker = activePlayer.getMarker();
@@ -46,21 +46,21 @@ const GameBoard = (function () {
     disableSquare(element);
     markSquare(element, marker);
     markArray(element.dataset.position, marker);
+
     // gameboard elements have [data-position] attr, which corresponds
     // to their position in the gameboard array. the array
     // is used to determine when a victory or tie takes place.
 
-    // Game module handles flow of the game & game menu
     Game.isRoundOver();
   };
 
   const disableSquare = (element) => {
-    element.removeEventListener("click", selectSquare);
+    element.removeEventListener("click", clickSquare);
     element.classList.remove("enabled");
   };
 
   const markSquare = (element, marker) => {
-    // classes "x" "o": add unique styles for each player
+    // classes "x" "o": add unique colors for each player
     element.classList.add(marker);
     element.textContent = marker;
   };
@@ -83,176 +83,253 @@ const GameBoard = (function () {
 })();
 
 //
-// Function Factory: creates player objects
+// Display Controller Module: handles animation & gui elements
 //
 
-const playerFactory = (playerName, OX) => {
-  // Capitalize 1st letter of playerName
-  const _name = playerName.charAt(0).toUpperCase() + playerName.slice(1);
-  const _marker = OX;
-  let _score = 0;
+const displayController = (() => {
+  //
+  // utility functions
+  //
 
-  function incrementScore() {
-    _score += 1;
-  }
+  // executes a function once transition has completed on an element
+  const doAfterTransition = (elementToWaitOn, callbackFunction) => {
+    elementToWaitOn.addEventListener("transitionend", callbackFunction, {
+      once: true,
+    });
+  };
 
-  function resetScore() {
-    _score = 0;
-  }
+  const fadeIn = (element) => {
+    element.classList.remove("display-none");
+    setTimeout(() => {
+      element.classList.remove("opacity0");
+    }, 10);
+  };
 
-  function getName() {
-    return _name;
-  }
+  const fadeOut = (element) => {
+    element.classList.add("opacity0");
+    doAfterTransition(element, () => {
+      element.classList.add("display-none");
+    });
+  };
 
-  function getScore() {
-    return _score;
-  }
+  //
+  // modal: displays are you ready msg, wins, ties, game winner:
+  //
 
-  function getMarker() {
-    return _marker;
-  }
+  const modal = document.querySelector(".modal"),
+    modalText = document.querySelector(".modal .text-container");
+
+  const showModal = (h3, h4 = "") => {
+    modalText.firstElementChild.textContent = h3;
+    modalText.lastElementChild.textContent = h4;
+
+    fadeIn(modal);
+
+    doAfterTransition(modal, () => {
+      fadeIn(modalText.firstElementChild);
+      doAfterTransition(modalText.firstElementChild, () => {
+        fadeIn(modalText.lastElementChild);
+      });
+    });
+  };
+
+  // hides the entire modal & h3/h4 for future fadeIn() transitions
+  const hideModal = () => {
+    fadeOut(modal);
+    fadeOut(modalText.firstElementChild);
+    fadeOut(modalText.lastElementChild);
+  };
+
+  //
+  // scoreboard related functions
+  //
+
+  // @param: player object
+  const renderName = (player) => {
+    player.getMarker() === "x"
+      ? (player.nameElement = document.querySelector(".player1-name"))
+      : (player.nameElement = document.querySelector(".player2-name"));
+
+    // .nameElement: used to show who's turn it is
+    player.nameElement.textContent = player.getName();
+  };
+
+  const player1Score = document.querySelector(".player1-score"),
+    player2Score = document.querySelector(".player2-score");
+
+  const updateScoreBoard = (score1, score2) => {
+    player1Score.textContent = score1;
+    player2Score.textContent = score2;
+  };
+
+  //
+  // game menu related functions
+  //
+
+  const header = document.querySelector("header"),
+    gameBoard = document.querySelector(".gameboard"),
+    scoreBoard = document.querySelector(".scoreboard"),
+    gameMenu = document.querySelector(".game-menu");
+
+  // used on 1st page load & after a game is completed
+  const displayGameMenu = () => {
+    gameBoard.classList.add("display-none");
+    gameBoard.classList.add("opacity0");
+    scoreBoard.classList.add("display-none");
+    scoreBoard.classList.add("opacity0");
+
+    fadeIn(header);
+    fadeIn(gameMenu);
+
+    enableGameMenu();
+  };
+
+  const startGameBtn = document.querySelector(".start-game-btn"),
+    nameInput = document.getElementById("name");
+
+  const enableGameMenu = () => {
+    startGameBtn.addEventListener("click", startGameHandler);
+    window.addEventListener("keypress", startGameHandler);
+  };
+
+  const disableGameMenu = () => {
+    startGameBtn.removeEventListener("click", startGameHandler);
+    window.removeEventListener("keypress", startGameHandler);
+  };
+
+  const startGameHandler = (e) => {
+    // if enter key OR click triggered event:
+    if (e.detail === 0) {
+      if (e.key === "Enter") isNamePresent();
+    } else isNamePresent();
+  };
+
+  const isNamePresent = () => {
+    if (nameInput.checkValidity()) {
+      Game.createPlayers(nameInput.value);
+      disableGameMenu();
+    }
+  };
+
+  // animates transition from game menu to round #1
+  const animateMenuTransition = (playerName) => {
+    fadeOut(header);
+    fadeOut(gameMenu);
+
+    showModal(
+      `Are you ready, ${playerName}?`,
+      "PS: You play as the robot, too :)"
+    );
+    doAfterTransition(modal, animateGameBoard);
+  };
+
+  //
+  // gameboard related functions
+  //
+
+  const animateGameBoard = () => {
+    // Remove "display: none" so elements position themselves while invisible,
+    // before opacity tranisitions kick in (prevents abrupt position shifts)
+    header.classList.remove("display-none");
+    gameBoard.classList.remove("display-none");
+    scoreBoard.classList.remove("display-none");
+
+    setTimeout(() => {
+      fadeIn(header);
+      setTimeout(() => {
+        fadeIn(gameBoard);
+        setTimeout(() => {
+          fadeIn(scoreBoard);
+          setTimeout(() => {
+            hideModal();
+          }, 1500);
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  };
 
   return {
-    getName,
-    getMarker,
-    getScore,
-    incrementScore,
-    resetScore,
+    displayGameMenu,
+    animateMenuTransition,
+    showModal,
+    hideModal,
+    updateScoreBoard,
+    renderName,
   };
-};
+})();
 
 //
 // Game Flow Module
 //
 
 const Game = (() => {
-  let player1, player2, activePlayer, round;
-  const header = document.querySelector("header"),
-    gameBoard = document.querySelector(".gameboard"),
-    scoreBoard = document.querySelector(".scoreboard"),
-    gameMenu = document.querySelector(".game-menu"),
-    nameInput = document.getElementById("name"),
-    startGameBtn = document.querySelector(".start-game-btn"),
-    player1Score = document.querySelector(".player1-score"),
-    player2Score = document.querySelector(".player2-score"),
-    modal = document.querySelector(".modal"),
-    modalText = document.querySelector(".modal .text-container");
+  let _player1, _player2, _activePlayer, _round;
 
-  activateGameMenu();
+  displayController.displayGameMenu();
 
-  // used on page first load & after a game is completed
-  function activateGameMenu() {
-    // hides gameboard & scoreboard after game is done:
-    gameBoard.classList.add("display-none");
-    scoreBoard.classList.add("display-none");
-    gameBoard.classList.add("opacity0");
-    scoreBoard.classList.add("opacity0");
-
-    // fadeIn: removes "display: none" & adds utility class that
-    // has an opacity transition
-    fadeIn(header);
-    fadeIn(gameMenu);
-
-    // enables button & enter key to start game
-    startGameBtn.addEventListener("click", startGameHandler);
-    window.addEventListener("keypress", startGameHandler);
-  }
-
-  function disableGameMenu() {
-    startGameBtn.removeEventListener("click", startGameHandler);
-    window.removeEventListener("keypress", startGameHandler);
-  }
-
-  function startGameHandler(e) {
-    // if enter key OR click triggered event:
-    if (e.detail === 0) {
-      if (e.key === "Enter") isNamePresent();
-    } else isNamePresent();
-
-    function isNamePresent() {
-      if (nameInput.checkValidity()) {
-        createPlayers();
-        disableGameMenu();
-      }
-    }
-  }
-
-  function createPlayers() {
+  const createPlayers = (name) => {
     // playerFactory() creates player objects, containing their
     // name, score, marker & methods to retrieve them.
-    player1 = playerFactory(nameInput.value, "x");
-    player2 = playerFactory("Robot", "o");
-    renderName(player1);
-    renderName(player2);
+    _player1 = playerFactory(name, "x");
+    _player2 = playerFactory("Robot", "o");
+    displayController.renderName(_player1);
+    displayController.renderName(_player2);
     beginGame();
-  }
+  };
 
-  // displays player names in scoreboard & stores name element in the
-  // player object
-  // @param: player object
-  function renderName(player) {
-    player.getMarker() === "x"
-      ? (player.nameElement = document.querySelector(".player1-name"))
-      : (player.nameElement = document.querySelector(".player2-name"));
-
-    player.nameElement.textContent = player.getName();
-  }
-
-  function beginGame() {
-    activePlayer = player1;
-    round = 1;
+  const beginGame = () => {
+    _activePlayer = _player1;
+    _round = 1;
     resetScores();
-    updateScoreBoard();
-    animateMenuTransition();
+    displayController.updateScoreBoard(
+      _player1.getScore(),
+      _player2.getScore()
+    );
+    displayController.animateMenuTransition(_player1.getName());
     beginRound();
-  }
+  };
 
-  function resetScores() {
-    player1.resetScore();
-    player2.resetScore();
-  }
+  const resetScores = () => {
+    _player1.resetScore();
+    _player2.resetScore();
+  };
 
-  function updateScoreBoard() {
-    player1Score.textContent = player1.getScore();
-    player2Score.textContent = player2.getScore();
-  }
-
-  function beginRound() {
+  const beginRound = () => {
     GameBoard.reset();
     displayActivePlayer();
-  }
+  };
 
   // Adds underline effect to show who's turn it is
-  function displayActivePlayer() {
-    inactivePlayer = getOtherPlayer(activePlayer);
+  const displayActivePlayer = () => {
+    inactivePlayer = getOtherPlayer(_activePlayer);
     inactivePlayer.nameElement.style.borderBottom = "none";
 
     // match color - player1: neutral vs player2: accent
-    if (player1 === activePlayer)
-      activePlayer.nameElement.style.borderBottom =
+    if (_player1 === _activePlayer)
+      _activePlayer.nameElement.style.borderBottom =
         "3px var(--clr-neutral-100) solid";
     else
-      activePlayer.nameElement.style.borderBottom =
+      _activePlayer.nameElement.style.borderBottom =
         "3px var(--clr-accent-100) solid";
-  }
+  };
 
   // Returns the inverse of a player object
   // @param player object
   // @return other player object
-  function getOtherPlayer(player) {
-    if (player.getName() === player1.getName()) return player2;
-    else return player1;
-  }
+  const getOtherPlayer = (player) => {
+    if (player.getName() === _player1.getName()) return _player2;
+    else return _player1;
+  };
 
-  function toggleActivePlayer() {
-    activePlayer === player1
-      ? (activePlayer = player2)
-      : (activePlayer = player1);
+  const toggleActivePlayer = () => {
+    _activePlayer === _player1
+      ? (_activePlayer = _player2)
+      : (_activePlayer = _player1);
     displayActivePlayer();
-  }
+  };
 
   // invoked by GameBoard module, when a player makes a move (clicks on a square)
-  function isRoundOver() {
+  const isRoundOver = () => {
     // regex: matches "x" or "o"
     const xo = /[xo]/;
     const arr = GameBoard.get();
@@ -280,161 +357,112 @@ const Game = (() => {
       // not a win, no empty spaces left:
       declareRoundTie();
     }
-  }
+  };
 
-  function declareRoundWinner() {
+  // @return: true, if either player has reached 3 wins.
+  const isGameOver = () => {
+    if (_player1.getScore() === 3 || _player2.getScore() === 3) return true;
+  };
+
+  const declareRoundWinner = () => {
     const winner = getActivePlayer();
     const loser = getOtherPlayer(winner);
 
     winner.incrementScore();
-    updateScoreBoard();
+    displayController.updateScoreBoard(
+      _player1.getScore(),
+      _player2.getScore()
+    );
 
+    // if a player has reached 3 wins
     if (isGameOver()) {
-      // a player has reached 3 wins
       declareGameWinner(winner);
     } else {
-      // display winner & increment round
-      showModal(
-        `${winner.getName()} takes round #${round}!`,
-        `${loser.getName()} begins round #${++round}`
+      // display round winner & increment round #
+      displayController.showModal(
+        `${winner.getName()} takes round #${_round}!`,
+        `${loser.getName()} begins round #${++_round}`
       );
 
       setTimeout(() => {
-        hideModal();
+        displayController.hideModal();
         // let loser go first in next round
         toggleActivePlayer();
         beginRound();
       }, 5000);
     }
-  }
+  };
 
-  // @return: true, if either player has reached 3 wins.
-  function isGameOver() {
-    if (player1.getScore() === 3 || player2.getScore() === 3) return true;
-  }
-
-  function declareRoundTie() {
-    showModal(`It's a tie! `, `Repeating Round #${round}`);
+  const declareRoundTie = () => {
+    displayController.showModal(`It's a tie!`, `Repeating Round #${_round}`);
 
     setTimeout(() => {
-      hideModal();
+      displayController.hideModal();
       beginRound();
     }, 4000);
-  }
+  };
 
   // @param: player object -- ie: the 1st to reach 3 wins
-  function declareGameWinner(winner) {
-    showModal(`${winner.getName()} wins the game!!`, `Thanks for playing :)`);
-
-    setTimeout(() => {
-      returnToGameMenu();
-    }, 5000);
-  }
-
-  function returnToGameMenu() {
-    hideModal();
-    activateGameMenu();
-  }
-
-  // modal is used to display wins/ties/etc. between rounds
-  // @params: h3 & h4 text
-  function showModal(h3, h4 = "") {
-    modalText.firstElementChild.textContent = h3;
-    modalText.lastElementChild.textContent = h4;
-
-    fadeIn(modal);
-
-    // doAfterTransition: waits for transition end of 1st parameter (element)
-    // & executes the second parameter (function)
-    doAfterTransition(modal, () => {
-      // after modal transition ends (blurred background), fadeIn(h3)
-      fadeIn(modalText.firstElementChild);
-      doAfterTransition(modalText.firstElementChild, () => {
-        // after h3 transition ends (blurred background), fadeIn(h4)
-        fadeIn(modalText.lastElementChild);
-      });
-    });
-  }
-
-  // hides the entire modal
-  // resets h3 / h4 to opacity: 0 for future fadeIn() transitions
-  function hideModal() {
-    fadeOut(modal);
-    modalText.firstElementChild.classList.add("opacity0");
-    modalText.lastElementChild.classList.add("opacity0");
-  }
-
-  // animates transition from game menu to round #1
-  function animateMenuTransition() {
-    fadeOut(header);
-    fadeOut(gameMenu);
-
-    showModal(
-      `Are you ready, ${player1.getName()}?`,
-      "PS: You play as the robot, too :)"
+  const declareGameWinner = (winner) => {
+    displayController.showModal(
+      `${winner.getName()} wins the game!!`,
+      `Thanks for playing :)`
     );
-    doAfterTransition(modal, animateGameBoard);
-
-    function animateGameBoard() {
-      // Remove "display: none" so elements position themselves while invisible,
-      // before opacity tranisitions kick in (prevents abrupt position shifts)
-      header.classList.remove("display-none");
-      gameBoard.classList.remove("display-none");
-      scoreBoard.classList.remove("display-none");
-
-      setTimeout(() => {
-        fadeIn(header);
-        setTimeout(() => {
-          fadeIn(gameBoard);
-          setTimeout(() => {
-            fadeIn(scoreBoard);
-            setTimeout(() => {
-              hideModal();
-            }, 1500);
-          }, 1000);
-        }, 1000);
-      }, 1000);
-    }
-  }
-
-  // utility function for timing transitions:
-  // @params: html element to wait for & function to execute once transition is done
-  function doAfterTransition(elementToWaitOn, callbackFunction) {
-    elementToWaitOn.addEventListener("transitionend", callbackFunction, {
-      once: true,
-    });
-  }
-
-  // utility function for animating the fade in effect
-  // @param: html element
-  function fadeIn(element) {
-    element.classList.remove("display-none");
 
     setTimeout(() => {
-      element.classList.remove("opacity0");
-    }, 100);
-  }
-
-  // utility function for animating the fade out effect
-  // @param: html element
-  function fadeOut(element) {
-    element.classList.add("opacity0");
-
-    doAfterTransition(element, () => {
-      element.classList.add("display-none");
-    });
-  }
+      displayController.hideModal();
+      displayController.displayGameMenu();
+    }, 5000);
+  };
 
   // used by GameBoard to determine which mark to place on the board
-  function getActivePlayer() {
-    return activePlayer;
-  }
+  const getActivePlayer = () => {
+    return _activePlayer;
+  };
 
   // global scope accessible functions, used by GameBoard:
   return {
     getActivePlayer,
     isRoundOver,
+    createPlayers,
   };
 })();
 
-const displayController = (() => {})();
+//
+// Function Factory: creates player objects
+//
+
+const playerFactory = (playerName, OX) => {
+  // Capitalize 1st letter of playerName
+  const _name = playerName.charAt(0).toUpperCase() + playerName.slice(1);
+  const _marker = OX;
+  let _score = 0;
+
+  const incrementScore = () => {
+    _score += 1;
+  };
+
+  const resetScore = () => {
+    _score = 0;
+  };
+
+  const getName = () => {
+    return _name;
+  };
+
+  const getScore = () => {
+    return _score;
+  };
+
+  const getMarker = () => {
+    return _marker;
+  };
+
+  return {
+    getName,
+    getMarker,
+    getScore,
+    incrementScore,
+    resetScore,
+  };
+};
