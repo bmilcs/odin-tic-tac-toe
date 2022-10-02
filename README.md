@@ -14,7 +14,7 @@ Welcome to Bryan Miller's Tic Tac Toe Project, the [ninth assignment](https://ww
 
 ## Summary
 
-Modular design pattern & factory functions were the core lessons practiced in this project and I have to say that I'm a huge fan. Modular design allows us to keep the global namespace tidy and selectively allow variables & methods to poke through, much like a firewall. Factory functions, an alternative to constructor functions, eliminate the use of the `new` keyword and allow us to explicitly define how our objects are to behave.
+Modular design pattern & factory functions were the core lessons practiced in this project and I have to say that I'm a huge fan. Modular design allows us to keep the global namespace tidy and selectively allow variables & methods to poke through, much like a firewall. Factory functions, an alternative to constructor functions, eliminate the use of the `new` keyword when instantiating objects and allow us to explicitly define how our objects are to behave.
 
 Using these skill sets, here is how I designed a game of Tic Tac Toe:
 
