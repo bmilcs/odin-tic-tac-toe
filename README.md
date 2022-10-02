@@ -7,39 +7,43 @@ Welcome to Bryan Miller's Tic Tac Toe Project, the [ninth assignment](https://ww
   - Factory Functions
   - Scope & Closure
   - Namespacing
+  - `transitionend` Event & `{once: true}` option
 - HTML
 - CSS
   - Transitions: Opacity & Display None
 
 ## Summary
 
-Modular design pattern & factory functions were the core lessons practiced in this project and I have to say that I'm a huge fan. Modular design allows us to keep the global namespace tidy and selectively allow variables & methods to poke through, much like a firewall whitelist, is extremely handy. Factory functions, an alternative to constructor functions, eliminate the use of the `new` keyword and allow us to explicitly define how our objects are to behave.
+Modular design pattern & factory functions were the core lessons practiced in this project and I have to say that I'm a huge fan. Modular design allows us to keep the global namespace tidy and selectively allow variables & methods to poke through, much like a firewall. Factory functions, an alternative to constructor functions, eliminate the use of the `new` keyword and allow us to explicitly define how our objects are to behave.
 
-Tic Tac Toe, as simple of a game as it is, is a fantastic project to practice the above skills. Here's how it works:
+Using these skill sets, here is how I designed a game of Tic Tac Toe:
 
-### `GameBoard` Module
+### GameBoard Module
 
-The `GameBoard` module is responsible for keeping track the gameboard (`gameBoardArray`), displaying it on page (`render()`, `reset()`) and controlling interactivity with its clickable squares (`EventHandlers` & the `selectSquare` callback function). The `GameBoard` restricts public access to 3 things, preventing write access to any of its variables:
+The `GameBoard` module is responsible for:
 
-- `getGameBoard()` (returns the array),
-- `render()`
-- `reset()` functions
+- Keeping track of the gameboard & marker placement: `gameBoardArray`
+- Displaying it on page: `render()`
+- Resetting the gameboard elements & array: `reset()`
+- Controlling interactivity with its clickable squares: `EventHandlers` & the `selectSquare` callback function
 
-The `GameBoard` is useless, until a square is clicked. From there, it reaches out to the `Game` flow module and finds out which marker to place down and to determine if any winners are present.
+The `GameBoard` restricts global access to `getGameBoard()`, `render()` and `reset()`.
 
-### `Game` Flow Module
+The `GameBoard` on its own is useless, until a square is clicked. From there, it reaches out to the `Game` flow module, whos responsibility is to find out who's turn it is, which marker to display and if a winner is present.
 
-The `Game` Flow module contains the bulk of the functionality of this project. It:
+### Game Flow Module
 
-1. Creates the player objects via the `playerFactory()` factory function
-2. Contains the html elements & functions that control the `gameMenu`
-3. Controls the flow of the game itself & `scoreBoard`
-4. Handles & animates transitions between screens
+The `Game` Flow module contains the core functionality of the game. It:
+
+1. Creates player objects by invoking the `playerFactory()` factory functions
+2. Controls the `gameMenu`'s html elements
+3. Dictates the flow of the game itself & updates the `scoreBoard`
+4. Animates transitions between screens
    1. The `modal` alerts the user when a game has concluded via a win, tie, etc.
 
-The beauty of the `Revealing Module Pattern` is that all of this is done privately in an `IIFE`, or immediately invoked function expression. Nothing is pubcicly accessible from the `Game` module, except for two functions: `getActivePlayer()` and `isRoundOver()`, which are used by the `GameBoard` when a click on the board is made.
+The beauty of the _Revealing Module Pattern_ is that all of this is done _privately_ in an `IIFE`, or immediately invoked function expression. Nothing is pubcicly accessible from the `Game` flow module, with the exception of two functions: `getActivePlayer()` and `isRoundOver()`, which are used by the `GameBoard` when a click on the board is made.
 
-### `playerFactory` Factory Function
+### playerFactory Factory Function
 
 Lastly, the `playerFactory()` Factory Function is responsible for creating player objects. These objects contain:
 
@@ -49,7 +53,7 @@ Lastly, the `playerFactory()` Factory Function is responsible for creating playe
 - Functions for getting name, marker, score (preventing direct manipulation)
 - Functions for incrementing score & resetting score
 
-In summary, this was a fantastic project that taught me the magic of the `transitionend` event and the `{once: true}` option for events. They allowed me to minimize the number of active `EventListeners`, keeping resource consumption low.
+In summary, this was a fantastic project that taught me the importance of the `transitionend` event and the `{once: true}` option for chaining CSS animations together. With their help, it allowed me to minimize the number of active `EventListeners`, keeping resource consumption to a minimum.
 
 ## Links
 
