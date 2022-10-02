@@ -31,19 +31,21 @@ The `GameBoard` restricts global access to `get()` & `reset()`.
 
 The `GameBoard` on its own is useless, until a square is clicked. From there, it reaches out to the `Game` flow module, whos responsibility is to find out who's turn it is, which marker to display and if a winner is present.
 
-### Display
+### DisplayController
+
+The `DisplayController` module is responsible for:
+
+- Updating GUI elements on the page
+- Controlling game menu, input box & button
+- Transitions between screens
+- Displaying the modal
 
 ### Game Flow Module
 
 The `Game` Flow module contains the core functionality of the game. It:
 
 1. Creates player objects by invoking the `playerFactory()` factory functions
-2. Controls the `gameMenu`'s html elements
-3. Dictates the flow of the game itself & updates the `scoreBoard`
-4. Animates transitions between screens
-   1. The `modal` alerts the user when a game has concluded via a win, tie, etc.
-
-The beauty of the _Revealing Module Pattern_ is that all of this is done _privately_ in an `IIFE`, or immediately invoked function expression. Nothing is pubcicly accessible from the `Game` flow module, with the exception of two functions: `getActivePlayer()` and `isRoundOver()`, which are used by the `GameBoard` when a click on the board is made.
+1. Dictates the flow of the game
 
 ### playerFactory Factory Function
 
