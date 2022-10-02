@@ -172,7 +172,7 @@ const DisplayController = (() => {
     gameMenu = document.querySelector(".game-menu");
 
   // used on 1st page load & after a game is completed
-  const displayGameMenu = () => {
+  const displayMenu = () => {
     gameBoard.classList.add("display-none");
     gameBoard.classList.add("opacity0");
     scoreBoard.classList.add("display-none");
@@ -248,13 +248,29 @@ const DisplayController = (() => {
     }, 1000);
   };
 
+  const displayActivePlayer = (player1, player2) => {
+    const activePlayer = Game.getActivePlayer();
+    const inactivePlayer = Game.getInactivePlayer();
+
+    inactivePlayer.nameElement.style.borderBottom = "none";
+
+    // match color - player1: neutral vs player2: accent
+    if (player1 === activePlayer)
+      activePlayer.nameElement.style.borderBottom =
+        "3px var(--clr-neutral-100) solid";
+    else
+      activePlayer.nameElement.style.borderBottom =
+        "3px var(--clr-accent-100) solid";
+  };
+
   return {
-    displayGameMenu,
+    renderName,
+    displayMenu,
     animateMenuTransition,
+    displayActivePlayer,
     showModal,
     hideModal,
     updateScoreBoard,
-    renderName,
   };
 })();
 
@@ -265,7 +281,7 @@ const DisplayController = (() => {
 const Game = (() => {
   let _player1, _player2, _activePlayer, _round;
 
-  DisplayController.displayGameMenu();
+  DisplayController.displayMenu();
 
   const createPlayers = (name) => {
     // playerFactory() creates player objects, containing their
@@ -301,19 +317,10 @@ const Game = (() => {
 
   // Adds underline effect to show who's turn it is
   const displayActivePlayer = () => {
-    inactivePlayer = getOtherPlayer(_activePlayer);
-    inactivePlayer.nameElement.style.borderBottom = "none";
-
-    // match color - player1: neutral vs player2: accent
-    if (_player1 === _activePlayer)
-      _activePlayer.nameElement.style.borderBottom =
-        "3px var(--clr-neutral-100) solid";
-    else
-      _activePlayer.nameElement.style.borderBottom =
-        "3px var(--clr-accent-100) solid";
+    DisplayController.displayActivePlayer(_player1, _player2);
   };
 
-  // Returns the inverse of a player object
+  // Returns the inverse of a player object (player2 in > player2 out)
   // @param player object
   // @return other player object
   const getOtherPlayer = (player) => {
@@ -411,18 +418,22 @@ const Game = (() => {
 
     setTimeout(() => {
       DisplayController.hideModal();
-      DisplayController.displayGameMenu();
+      DisplayController.displayMenu();
     }, 5000);
   };
 
-  // used by GameBoard to determine which mark to place on the board
   const getActivePlayer = () => {
     return _activePlayer;
+  };
+
+  const getInactivePlayer = () => {
+    return getOtherPlayer(_activePlayer);
   };
 
   // global scope accessible functions, used by GameBoard:
   return {
     getActivePlayer,
+    getInactivePlayer,
     isRoundOver,
     createPlayers,
   };
