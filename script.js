@@ -173,6 +173,7 @@ const Game = (function () {
     inactivePlayer = getOtherPlayer(activePlayer);
     inactivePlayer.nameElement.style.borderBottom = "none";
 
+    // match color - player1: neutral vs player2: accent
     if (player1 === activePlayer)
       activePlayer.nameElement.style.borderBottom =
         "3px var(--clr-neutral-100) solid";
