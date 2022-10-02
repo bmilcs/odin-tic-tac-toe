@@ -1,12 +1,12 @@
 // GameBoard is a modular, IIFE function, that handles the gameboard array & elements
 
 const GameBoard = (function () {
-  const gameContainer = document.getElementById("game-container");
-  let gameBoardArray = ["", "", "", "", "", "", "", "", ""];
+  let gameBoardArray = Array(9).fill("");
   const gameBoardElements = render();
 
   // returns an array of html elements for each clickable square
   function render() {
+    const gameContainer = document.getElementById("game-container");
     return gameBoardArray.map((value, i) => {
       const div = document.createElement("div");
       div.classList.add("square");
@@ -18,9 +18,7 @@ const GameBoard = (function () {
 
   // resets gameboard array & gameboard gui elements
   function reset() {
-    for (let i = 0; i < gameBoardArray.length; i++) {
-      gameBoardArray[i] = "";
-    }
+    gameBoardArray = Array(9).fill("");
 
     // reset gui elements
     gameBoardElements.forEach((square) => {
