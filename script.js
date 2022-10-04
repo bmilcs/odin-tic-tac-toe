@@ -320,7 +320,7 @@ const Game = (() => {
     DisplayController.displayActivePlayer(_player1, _player2);
   };
 
-  // Returns the inverse of a player object (player2 in > player2 out)
+  // Returns the inverse of a player object (player2 in > player1 out)
   // @param player object
   // @return other player object
   const getOtherPlayer = (player) => {
