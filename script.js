@@ -59,7 +59,7 @@ const GameBoard = (() => {
     // to their position in the gameboard array. the array
     // is used to determine when a victory or tie takes place.
 
-    Game.isRoundOver();
+    Game.checkForRoundWinner();
   };
 
   const disableSquare = (element) => {
@@ -149,28 +149,6 @@ const DisplayController = (() => {
   };
 
   //
-  // scoreboard related functions
-  //
-
-  // @param: player object
-  const renderName = (player) => {
-    player.getMarker() === "x"
-      ? (player.nameElement = document.querySelector(".player1-name"))
-      : (player.nameElement = document.querySelector(".player2-name"));
-
-    // .nameElement: used to show who's turn it is
-    player.nameElement.textContent = player.getName();
-  };
-
-  const player1Score = document.querySelector(".player1-score"),
-    player2Score = document.querySelector(".player2-score");
-
-  const updateScoreBoard = (score1, score2) => {
-    player1Score.textContent = score1;
-    player2Score.textContent = score2;
-  };
-
-  //
   // game menu related functions
   //
 
@@ -220,19 +198,19 @@ const DisplayController = (() => {
   };
 
   // animates transition from game menu to round #1
-  const animateMenuTransition = (playerName) => {
+  const animateMenuToGame = (playerName) => {
     fadeOut(header);
     fadeOut(gameMenu);
 
     showModal(
       `Are you ready, ${playerName}?`,
-      "PS: You play as the robot, too :)"
+      'PS: You play as "Maynard", too :)'
     );
 
     setTimeout(() => {
       hideModal();
       doAfterTransition(modal, animateGameBoard);
-    }, 3500);
+    }, 4000);
   };
 
   //
@@ -252,12 +230,9 @@ const DisplayController = (() => {
         fadeIn(gameBoard);
         setTimeout(() => {
           fadeIn(scoreBoard);
-          // setTimeout(() => {
-          //   hideModal();
-          // }, 1000);
-        }, 1000);
-      }, 1000);
-    }, 500);
+        }, 750);
+      }, 750);
+    }, 750);
   };
 
   const displayActivePlayer = (player1, player2) => {
@@ -275,10 +250,32 @@ const DisplayController = (() => {
         "3px var(--clr-accent-100) solid";
   };
 
+  //
+  // scoreboard related functions
+  //
+
+  // @param: player object
+  const renderName = (player) => {
+    player.getMarker() === "x"
+      ? (player.nameElement = document.querySelector(".player1-name"))
+      : (player.nameElement = document.querySelector(".player2-name"));
+
+    // .nameElement: used to show who's turn it is
+    player.nameElement.textContent = player.getName();
+  };
+
+  const player1Score = document.querySelector(".player1-score"),
+    player2Score = document.querySelector(".player2-score");
+
+  const updateScoreBoard = (score1, score2) => {
+    player1Score.textContent = score1;
+    player2Score.textContent = score2;
+  };
+
   return {
     renderName,
     displayMenu,
-    animateMenuTransition,
+    animateMenuToGame,
     displayActivePlayer,
     showModal,
     hideModal,
@@ -299,7 +296,7 @@ const Game = (() => {
     // playerFactory() creates player objects, containing their
     // name, score, marker & methods to retrieve them.
     _player1 = playerFactory(name, "x");
-    _player2 = playerFactory("Robot", "o");
+    _player2 = playerFactory("Maynard", "o");
     DisplayController.renderName(_player1);
     DisplayController.renderName(_player2);
     beginGame();
@@ -313,7 +310,7 @@ const Game = (() => {
       _player1.getScore(),
       _player2.getScore()
     );
-    DisplayController.animateMenuTransition(_player1.getName());
+    DisplayController.animateMenuToGame(_player1.getName());
     beginRound();
   };
 
@@ -348,7 +345,7 @@ const Game = (() => {
   };
 
   // invoked by GameBoard module, when a player makes a move (clicks on a square)
-  const isRoundOver = () => {
+  const checkForRoundWinner = () => {
     // regex: matches "x" or "o"
     const xo = /[xo]/;
     const arr = GameBoard.get();
@@ -408,7 +405,7 @@ const Game = (() => {
         // let loser go first in next round
         toggleActivePlayer();
         beginRound();
-      }, 5000);
+      }, 4250);
     }
   };
 
@@ -446,7 +443,7 @@ const Game = (() => {
   return {
     getActivePlayer,
     getInactivePlayer,
-    isRoundOver,
+    checkForRoundWinner,
     createPlayers,
   };
 })();
