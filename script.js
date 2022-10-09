@@ -5,16 +5,24 @@
 const GameBoard = (() => {
   let _boardArray = Array(9).fill("");
 
+  // stored in gameBoardElements, which is used to reset game after each round
+  const prepareElements = () => {
+    return _boardArray.map((square, i) => {
+      const div = document.createElement("div");
+      div.classList.add("square");
+      div.setAttribute("data-position", i);
+      return div;
+    });
+  };
+
+  const gameBoardElements = prepareElements();
+
   // @return: an array of html elements for each clickable square
   const render = () => {
     const gameContainer = document.getElementById("game-container");
 
-    return _boardArray.map((x, i) => {
-      const div = document.createElement("div");
-      div.classList.add("square");
-      div.setAttribute("data-position", i);
+    gameBoardElements.forEach((div) => {
       gameContainer.appendChild(div);
-      return div;
     });
   };
 
@@ -37,7 +45,7 @@ const GameBoard = (() => {
     });
   };
 
-  // callback function: invoked when square is clicked
+  // callback: invoked when square is clicked
   const clickSquare = (e) => {
     const element = e.target;
     const activePlayer = Game.getActivePlayer();
@@ -73,7 +81,7 @@ const GameBoard = (() => {
     return _boardArray;
   };
 
-  const gameBoardElements = render();
+  render();
 
   // global scope only has access to the following functions
   return {
@@ -116,8 +124,8 @@ const DisplayController = (() => {
   // modal: displays are you ready msg, wins, ties, game winner:
   //
 
-  const modal = document.querySelector(".modal"),
-    modalText = document.querySelector(".modal .text-container");
+  const modal = document.querySelector(".modal");
+  const modalText = document.querySelector(".modal .text-container");
 
   const showModal = (h3, h4 = "") => {
     modalText.firstElementChild.textContent = h3;
@@ -136,8 +144,8 @@ const DisplayController = (() => {
   // hides the entire modal & h3/h4 for future fadeIn() transitions
   const hideModal = () => {
     fadeOut(modal);
-    fadeOut(modalText.firstElementChild);
-    fadeOut(modalText.lastElementChild);
+    modalText.firstElementChild.classList.add("opacity0");
+    modalText.lastElementChild.classList.add("opacity0");
   };
 
   //
@@ -166,10 +174,10 @@ const DisplayController = (() => {
   // game menu related functions
   //
 
-  const header = document.querySelector("header"),
-    gameBoard = document.querySelector(".gameboard"),
-    scoreBoard = document.querySelector(".scoreboard"),
-    gameMenu = document.querySelector(".game-menu");
+  const header = document.querySelector("header");
+  const gameBoard = document.querySelector(".gameboard");
+  const scoreBoard = document.querySelector(".scoreboard");
+  const gameMenu = document.querySelector(".game-menu");
 
   // used on 1st page load & after a game is completed
   const displayMenu = () => {
@@ -220,7 +228,11 @@ const DisplayController = (() => {
       `Are you ready, ${playerName}?`,
       "PS: You play as the robot, too :)"
     );
-    doAfterTransition(modal, animateGameBoard);
+
+    setTimeout(() => {
+      hideModal();
+      doAfterTransition(modal, animateGameBoard);
+    }, 3500);
   };
 
   //
@@ -240,12 +252,12 @@ const DisplayController = (() => {
         fadeIn(gameBoard);
         setTimeout(() => {
           fadeIn(scoreBoard);
-          setTimeout(() => {
-            hideModal();
-          }, 1500);
+          // setTimeout(() => {
+          //   hideModal();
+          // }, 1000);
         }, 1000);
       }, 1000);
-    }, 1000);
+    }, 500);
   };
 
   const displayActivePlayer = (player1, player2) => {
